@@ -6,11 +6,6 @@ from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import train_test_split
 import plotly.graph_objects as go
 
-# load the data
-df_target = pd.read_csv('app/lucas_organic_carbon/target/lucas_organic_carbon_target.csv')
-df_training = pd.read_csv('app/lucas_organic_carbon/training_test/lucas_organic_carbon_training_and_test_data.csv')
-df_combined = pd.merge(df_training, df_target, left_index=True, right_index=True)
-
 # Streamlit app
 st.title("VisA")
 
@@ -24,8 +19,13 @@ data_percentage = st.slider('Percentage of Data to Use', min_value=1, max_value=
 # user input for normalization toggle
 normalize_cm = st.checkbox('Normalize Confusion Matrix', value=True)
 
-# spinner while training the model
-with st.spinner('Training and evaluating the model...'):
+# spinner while loading
+with st.spinner('Preparing the data...'):
+    # load the data
+    df_target = pd.read_csv('app/lucas_organic_carbon/target/lucas_organic_carbon_target.csv')
+    df_training = pd.read_csv('app/lucas_organic_carbon/training_test/lucas_organic_carbon_training_and_test_data.csv')
+    df_combined = pd.merge(df_training, df_target, left_index=True, right_index=True)
+
     # sample the data
     sample_size = int(len(df_combined) * (data_percentage / 100))
     df_sampled = df_combined.sample(n=sample_size, random_state=42)
@@ -43,12 +43,16 @@ with st.spinner('Training and evaluating the model...'):
     # split the data
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
+# spinner while loading
+with st.spinner('Training the model...'):
     # train model
     rf_classifier = RandomForestClassifier(max_depth=max_depth, n_estimators=n_estimators)
     rf_classifier.fit(X_train, y_train)
     y_pred = rf_classifier.predict(X_test)
 
-    # confusion matrix
+# spinner while loading
+with st.spinner('Evaluating the model...'):
+    # get actual label names
     unique_labels = label_encoder.classes_
 
     # compute confusion matrix
