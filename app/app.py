@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
 from sklearn.preprocessing import LabelEncoder
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import confusion_matrix
@@ -8,8 +7,8 @@ from sklearn.model_selection import train_test_split
 import plotly.graph_objects as go
 
 # load the data
-df_target = pd.read_csv('/Users/noelkronenberg/Documents/GitHub/hub-visa/00_EDA/lucas_organic_carbon/target/lucas_organic_carbon_target.csv')
-df_training = pd.read_csv('/Users/noelkronenberg/Documents/GitHub/hub-visa/00_EDA/lucas_organic_carbon/training_test/lucas_organic_carbon_training_and_test_data.csv')
+df_target = pd.read_csv('app/lucas_organic_carbon/target/lucas_organic_carbon_target.csv')
+df_training = pd.read_csv('app/lucas_organic_carbon/training_test/lucas_organic_carbon_training_and_test_data.csv')
 df_combined = pd.merge(df_training, df_target, left_index=True, right_index=True)
 
 # Streamlit app

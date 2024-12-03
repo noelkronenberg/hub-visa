@@ -162,3 +162,4 @@ cython_debug/
 #.idea/
 
 00_EDA/lucas_organic_carbon/training_test/lucas_organic_carbon_training_and_test_data.csv
+app/lucas_organic_carbon/training_test/lucas_organic_carbon_training_and_test_data.csv
