@@ -21,8 +21,11 @@ n_estimators = st.slider('Number of Estimators', min_value=10, max_value=500, va
 # user input for percentage of data to use
 data_percentage = st.slider('Percentage of Data to Use', min_value=1, max_value=100, value=1)
 
+# user input for normalization toggle
+normalize_cm = st.checkbox('Normalize Confusion Matrix', value=True)
+
 # spinner while training the model
-with st.spinner('Training the model...'):
+with st.spinner('Training and evaluating the model...'):
     # sample the data
     sample_size = int(len(df_combined) * (data_percentage / 100))
     df_sampled = df_combined.sample(n=sample_size, random_state=42)
@@ -40,13 +43,19 @@ with st.spinner('Training the model...'):
     # split the data
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
+    # train model
     rf_classifier = RandomForestClassifier(max_depth=max_depth, n_estimators=n_estimators)
     rf_classifier.fit(X_train, y_train)
     y_pred = rf_classifier.predict(X_test)
 
     # confusion matrix
     unique_labels = label_encoder.classes_
-    cm = confusion_matrix(y_test, y_pred, labels=range(len(unique_labels)))
+
+    # compute confusion matrix
+    if normalize_cm:
+        cm = confusion_matrix(y_test, y_pred, labels=range(len(unique_labels)), normalize='true')
+    else:
+        cm = confusion_matrix(y_test, y_pred, labels=range(len(unique_labels)))
 
     # display the confusion matrix
     fig = go.Figure(data=go.Heatmap(
@@ -56,13 +65,11 @@ with st.spinner('Training the model...'):
         colorscale='Viridis',
         showscale=True
     ))
-
     fig.update_layout(
-        title='Confusion Matrix',
+        title='Confusion Matrix (Normalized)' if normalize_cm else 'Confusion Matrix',
         xaxis_title='Predicted Label',
         yaxis_title='Actual Label',
         xaxis=dict(tickmode='array', tickvals=list(range(len(unique_labels))), ticktext=unique_labels),
         yaxis=dict(tickmode='array', tickvals=list(range(len(unique_labels))), ticktext=unique_labels)
     )
-
     st.plotly_chart(fig)
