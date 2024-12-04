@@ -2,22 +2,20 @@ import streamlit as st
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score, f1_score, classification_report
 from sklearn.model_selection import train_test_split
 import plotly.graph_objects as go
 
-# Streamlit app
-st.title("VisA")
+# streamlit app
+st.set_page_config(page_title="VisA Dashboard", layout="wide")
+st.title("VisA Dashboard")
 
-# user input for Random Forest parameters
-max_depth = st.slider('Max Depth', min_value=1, max_value=20, value=14)
-n_estimators = st.slider('Number of Estimators', min_value=10, max_value=500, value=384)
-
-# user input for percentage of data to use
-data_percentage = st.slider('Percentage of Data to Use', min_value=1, max_value=100, value=1)
-
-# user input for normalization toggle
-normalize_cm = st.checkbox('Normalize Confusion Matrix', value=True)
+# sidebar for user inputs
+st.sidebar.header("Model Parameters")
+max_depth = st.sidebar.slider('Max Depth', min_value=1, max_value=20, value=14)
+n_estimators = st.sidebar.slider('Number of Estimators', min_value=10, max_value=500, value=384)
+data_percentage = st.sidebar.slider('Percentage of Data to Use', min_value=1, max_value=100, value=1)
+normalize_cm = st.sidebar.checkbox('Normalize Confusion Matrix', value=True)
 
 # spinner while loading
 with st.spinner('Preparing the data...'):
@@ -52,7 +50,25 @@ with st.spinner('Training the model...'):
 
 # spinner while loading
 with st.spinner('Evaluating the model...'):
-    # get actual label names
+    ### overall metrics
+
+    # compute metrics
+    accuracy = accuracy_score(y_test, y_pred)
+    precision = precision_score(y_test, y_pred, average='weighted')
+    recall = recall_score(y_test, y_pred, average='weighted')
+    f1 = f1_score(y_test, y_pred, average='weighted')
+
+    # display metrics (in columns)
+    st.subheader("Overall Metrics")
+    col1, col2, col3, col4 = st.columns(4)
+    col1.metric("Accuracy", f"{accuracy:.2f}")
+    col2.metric("Precision", f"{precision:.2f}")
+    col3.metric("Recall", f"{recall:.2f}")
+    col4.metric("F1 Score", f"{f1:.2f}")
+
+    ### confusion matrix
+
+    # actual label names
     unique_labels = label_encoder.classes_
 
     # compute confusion matrix
@@ -61,7 +77,8 @@ with st.spinner('Evaluating the model...'):
     else:
         cm = confusion_matrix(y_test, y_pred, labels=range(len(unique_labels)))
 
-    # display the confusion matrix
+    # display confusion matrix
+    st.subheader('Confusion Matrix')
     fig = go.Figure(data=go.Heatmap(
         z=cm,
         x=[f'Predicted: {label}' for label in unique_labels],
@@ -70,7 +87,6 @@ with st.spinner('Evaluating the model...'):
         showscale=True
     ))
     fig.update_layout(
-        title='Confusion Matrix (Normalized)' if normalize_cm else 'Confusion Matrix',
         xaxis_title='Predicted Label',
         yaxis_title='Actual Label',
         xaxis=dict(tickmode='array', tickvals=list(range(len(unique_labels))), ticktext=unique_labels),
