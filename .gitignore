@@ -73,7 +73,6 @@ docs/_build/
 
 # PyBuilder
 .pybuilder/
-target/
 
 # Jupyter Notebook
 .ipynb_checkpoints
@@ -163,3 +162,6 @@ cython_debug/
 
 00_EDA/lucas_organic_carbon/training_test/lucas_organic_carbon_training_and_test_data.csv
 app/lucas_organic_carbon/training_test/lucas_organic_carbon_training_and_test_data.csv
+00_EDA/lucas_organic_carbon/target/lucas_organic_carbon_target.csv
+app/.DS_Store
+app/lucas_organic_carbon/.DS_Store
