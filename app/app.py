@@ -109,6 +109,8 @@ if st.sidebar.button('Update'):
             st.session_state.cm = confusion_matrix(y_test, y_pred, labels=range(len(st.session_state.unique_labels)), normalize='true')
         else:
             st.session_state.cm = confusion_matrix(y_test, y_pred, labels=range(len(st.session_state.unique_labels)))
+    
+    st.session_state.first_run = False
 
 # show results
 def visualize():
@@ -138,8 +140,19 @@ def visualize():
     st.plotly_chart(fig)
 
 if __name__ == "__main__":
+
+    # show placeholder
     if 'first_run' not in st.session_state:
-        st.session_state.first_run = False
-        st.sidebar.warning("Adjust the parameters and run the model to view results.")
-    else:
+        placeholder = st.empty()
+        placeholder.warning("Adjust the parameters and run the model to view results.")
+
+    # show results
+    if 'first_run' in st.session_state:
         visualize()
+
+    # sidebar for data exploration
+    st.sidebar.header("Data Exploration")
+    if st.sidebar.checkbox('Show raw data'):
+        df_combined = load_data()
+        st.subheader('Raw Data')
+        st.dataframe(df_combined)
