@@ -165,3 +165,9 @@ app/lucas_organic_carbon/training_test/lucas_organic_carbon_training_and_test_da
 00_EDA/lucas_organic_carbon/target/lucas_organic_carbon_target.csv
 app/.DS_Store
 app/lucas_organic_carbon/.DS_Store
+*.csv
+data-exploration/.DS_Store
+data-exploration/lucas_organic_carbon/.DS_Store
+00_EDA/.DS_Store
+.DS_Store
+00_EDA/lucas_organic_carbon/.DS_Store
