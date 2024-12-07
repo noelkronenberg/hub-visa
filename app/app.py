@@ -5,10 +5,44 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score, f1_score
 from sklearn.model_selection import train_test_split
 import plotly.graph_objects as go
+import logging
+
+# configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # streamlit app
 st.set_page_config(page_title="VisA Dashboard", layout="wide")
 st.title("VisA Dashboard")
+
+# sidebar for data exploration
+st.sidebar.header("Data Settings")
+
+# preset data
+preset_target = 'app/lucas_organic_carbon/target/lucas_organic_carbon_target.csv'
+preset_training = 'app/lucas_organic_carbon/training_test/compressed_data.csv'
+
+# file upload
+target_file = st.sidebar.file_uploader("Upload Target CSV", type=["csv"])
+training_file = st.sidebar.file_uploader("Upload Training CSV", type=["csv"])
+
+if target_file is not None:
+    df_target = pd.read_csv(target_file)
+    st.session_state['target_data'] = df_target
+    logging.info("Added target file to session state.")
+
+if training_file is not None:
+    df_training = pd.read_csv(training_file)
+    st.session_state['training_data'] = df_training
+    logging.info("Added training file to session state.")
+
+if st.sidebar.checkbox('Show raw data'):
+    df_target = st.session_state.get('target_data', pd.read_csv(preset_target))
+    df_training = st.session_state.get('training_data', pd.read_csv(preset_training))
+    st.subheader('Training Data')
+    st.write(df_training)
+    st.subheader('Target Data')
+    st.write(df_target)
+    logging.info("Raw data displayed successfully.")
 
 # initialize session state with default parameters
 if 'max_depth' not in st.session_state:
@@ -21,7 +55,7 @@ if 'normalize_cm' not in st.session_state:
     st.session_state.normalize_cm = True
 
 # sidebar for user inputs
-st.sidebar.header("Model Parameters")
+st.sidebar.header("Model Settings")
 max_depth = st.sidebar.slider('Max Depth', min_value=1, max_value=200, value=st.session_state.max_depth)
 n_estimators = st.sidebar.slider('Number of Estimators', min_value=1, max_value=1000, value=st.session_state.n_estimators)
 data_percentage = st.sidebar.slider('Percentage of Data to Use', min_value=1, max_value=100, value=st.session_state.data_percentage)
@@ -46,9 +80,27 @@ st.session_state.normalize_cm = normalize_cm
 # load data
 @st.cache_data(show_spinner=False)
 def load_data():
-    df_target = pd.read_csv('app/lucas_organic_carbon/target/lucas_organic_carbon_target.csv')
-    df_training = pd.read_csv('app/lucas_organic_carbon/training_test/compressed_data.csv') # NOTE: this is a compressed version of the data (for demo purposes)
+
+    # load data if not in session state
+
+    if 'target_data' not in st.session_state:
+        df_target = pd.read_csv(preset_target)
+        st.session_state['target_data'] = df_target
+        logging.info("Loaded target data from preset.")
+    else:
+        df_target = st.session_state['target_data']
+        logging.info("Loaded target data from uploaded file.")
+
+    if 'training_data' not in st.session_state:
+        df_training = pd.read_csv(preset_training) # NOTE: this is a compressed version of the data (for demo purposes)
+        st.session_state['training_data'] = df_training
+        logging.info("Loaded training data from preset.")
+    else:
+        df_training = st.session_state['training_data']
+        logging.info("Loaded training data from uploaded file.")
+    
     df_combined = pd.merge(df_training, df_target, left_index=True, right_index=True)
+    
     return df_combined
 
 # prepare data
@@ -70,6 +122,7 @@ def prepare_data(df_combined, data_percentage):
 
     # split the data
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
     return X_train, X_test, y_train, y_test, label_encoder
 
 # train model
@@ -86,11 +139,13 @@ if st.sidebar.button('Update'):
     with st.spinner('Preparing the data...'):
         df_combined = load_data()
         X_train, X_test, y_train, y_test, label_encoder = prepare_data(df_combined, data_percentage)
+        logging.info("Data prepared successfully.")
 
     # spinner while training model
     with st.spinner('Training the model...'):
         rf_classifier = train_model(X_train, y_train, max_depth, n_estimators)
         y_pred = rf_classifier.predict(X_test)
+        logging.info("Model trained successfully.")
 
     # spinner while evaluating
     with st.spinner('Evaluating the model...'):
@@ -109,6 +164,8 @@ if st.sidebar.button('Update'):
             st.session_state.cm = confusion_matrix(y_test, y_pred, labels=range(len(st.session_state.unique_labels)), normalize='true')
         else:
             st.session_state.cm = confusion_matrix(y_test, y_pred, labels=range(len(st.session_state.unique_labels)))
+
+        logging.info("Model evaluated successfully.")
     
     st.session_state.first_run = False
 
@@ -121,6 +178,7 @@ def visualize():
     col2.metric("Precision", f"{st.session_state.get('precision', 0):.2f}")
     col3.metric("Recall", f"{st.session_state.get('recall', 0):.2f}")
     col4.metric("F1 Score", f"{st.session_state.get('f1', 0):.2f}")
+    logging.info("Metrics displayed successfully.")
 
     # display confusion matrix
     st.subheader('Confusion Matrix')
@@ -138,6 +196,7 @@ def visualize():
         yaxis=dict(tickmode='array', tickvals=list(range(len(st.session_state.unique_labels))), ticktext=st.session_state.unique_labels)
     )
     st.plotly_chart(fig)
+    logging.info("Confusion matrix displayed successfully.")
 
 if __name__ == "__main__":
 
@@ -145,14 +204,9 @@ if __name__ == "__main__":
     if 'first_run' not in st.session_state:
         placeholder = st.empty()
         placeholder.warning("Adjust the parameters and run the model to view results.")
+        logging.info("Placeholder displayed successfully.")
 
     # show results
     if 'first_run' in st.session_state:
         visualize()
-
-    # sidebar for data exploration
-    st.sidebar.header("Data Exploration")
-    if st.sidebar.checkbox('Show raw data'):
-        df_combined = load_data()
-        st.subheader('Raw Data')
-        st.dataframe(df_combined)
+        logging.info("Results displayed successfully.")
