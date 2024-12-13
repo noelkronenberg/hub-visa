@@ -111,7 +111,7 @@ def train_model(X_train, y_train, max_depth, n_estimators):
     return rf_classifier
 
 # sidebar for user inputs
-with st.sidebar.expander("Model", expanded=False):
+with st.sidebar.expander("Model", expanded=True):
     max_depth = st.slider('Max Depth', min_value=1, max_value=200, value=st.session_state.max_depth)
     n_estimators = st.slider('Number of Estimators', min_value=1, max_value=1000, value=st.session_state.n_estimators)
     data_percentage = st.slider('Percentage of Data to Use', min_value=1, max_value=100, value=st.session_state.data_percentage)
