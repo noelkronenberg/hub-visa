@@ -39,13 +39,13 @@ with st.sidebar.expander("Data", expanded=False):
     show_data = st.checkbox('Show raw data')
 
 if show_data:
-    df_target = st.session_state.get('target_data', pd.read_csv(preset_target))
-    df_training = st.session_state.get('training_data', pd.read_csv(preset_training))
-    st.subheader('Training Data')
-    st.write(df_training)
-    st.subheader('Target Data')
-    st.write(df_target)
-    logging.info("Raw data displayed successfully.")
+        df_target = st.session_state.get('target_data', pd.read_csv(preset_target))
+        df_training = st.session_state.get('training_data', pd.read_csv(preset_training))
+        st.subheader('Training Data')
+        st.write(df_training)
+        st.subheader('Target Data')
+        st.write(df_target)
+        logging.info("Raw data displayed successfully.")
 
 # initialize session state with default parameters
 if 'max_depth' not in st.session_state:
@@ -181,7 +181,7 @@ def visualize():
     logging.info("Metrics displayed successfully.")
 
     # metrics for selected class
-    
+
     class_y_test = (st.session_state.y_test == st.session_state.selected_class_index).astype(int)
     class_y_pred = (st.session_state.y_pred == st.session_state.selected_class_index).astype(int)
     class_accuracy = accuracy_score(class_y_test, class_y_pred)
@@ -213,6 +213,7 @@ def visualize():
         yaxis_title='Actual Label',
         xaxis=dict(tickmode='array', tickvals=list(range(len(st.session_state.unique_labels))), ticktext=st.session_state.unique_labels),
         yaxis=dict(tickmode='array', tickvals=list(range(len(st.session_state.unique_labels))), ticktext=st.session_state.unique_labels),
+        margin=dict(l=20, r=20, t=20, b=20)
     )
 
     # confusion matrix: add a rectangle shape to create a border effect
