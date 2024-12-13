@@ -138,32 +138,32 @@ if st.sidebar.button('Update'):
     # spinner while loading data
     with st.spinner('Preparing the data...'):
         df_combined = load_data()
-        X_train, X_test, y_train, y_test, label_encoder = prepare_data(df_combined, data_percentage)
+        X_train, st.session_state.X_test, y_train, st.session_state.y_test, label_encoder = prepare_data(df_combined, data_percentage)
         logging.info("Data prepared successfully.")
 
     # spinner while training model
     with st.spinner('Training the model...'):
         rf_classifier = train_model(X_train, y_train, max_depth, n_estimators)
-        y_pred = rf_classifier.predict(X_test)
+        st.session_state.y_pred = rf_classifier.predict(st.session_state.X_test)
         logging.info("Model trained successfully.")
 
     # spinner while evaluating
     with st.spinner('Evaluating the model...'):
 
         # compute metrics (and save in session state)
-        st.session_state.accuracy = accuracy_score(y_test, y_pred)
-        st.session_state.precision = precision_score(y_test, y_pred, average='weighted')
-        st.session_state.recall = recall_score(y_test, y_pred, average='weighted')
-        st.session_state.f1 = f1_score(y_test, y_pred, average='weighted')
+        st.session_state.accuracy = accuracy_score(st.session_state.y_test, st.session_state.y_pred)
+        st.session_state.precision = precision_score(st.session_state.y_test, st.session_state.y_pred, average='weighted')
+        st.session_state.recall = recall_score(st.session_state.y_test, st.session_state.y_pred, average='weighted')
+        st.session_state.f1 = f1_score(st.session_state.y_test, st.session_state.y_pred, average='weighted')
 
         # actual label names (and save in session state)
         st.session_state.unique_labels = label_encoder.classes_
 
         # compute confusion matrix (and save in session state)
         if normalize_cm:
-            st.session_state.cm = confusion_matrix(y_test, y_pred, labels=range(len(st.session_state.unique_labels)), normalize='true')
+            st.session_state.cm = confusion_matrix(st.session_state.y_test, st.session_state.y_pred, labels=range(len(st.session_state.unique_labels)), normalize='true')
         else:
-            st.session_state.cm = confusion_matrix(y_test, y_pred, labels=range(len(st.session_state.unique_labels)))
+            st.session_state.cm = confusion_matrix(st.session_state.y_test, st.session_state.y_pred, labels=range(len(st.session_state.unique_labels)))
 
         logging.info("Model evaluated successfully.")
     
@@ -171,7 +171,10 @@ if st.sidebar.button('Update'):
 
 # show results
 def visualize():
+
     # display metrics (in columns)
+
+    # overall metrics 
     st.subheader("Overall Metrics")
     col1, col2, col3, col4 = st.columns(4)
     col1.metric("Accuracy", f"{st.session_state.get('accuracy', 0):.2f}")
@@ -179,6 +182,23 @@ def visualize():
     col3.metric("Recall", f"{st.session_state.get('recall', 0):.2f}")
     col4.metric("F1 Score", f"{st.session_state.get('f1', 0):.2f}")
     logging.info("Metrics displayed successfully.")
+
+    # metrics for selected class
+
+    class_y_test = (st.session_state.y_test == st.session_state.selected_class_index).astype(int)
+    class_y_pred = (st.session_state.y_pred == st.session_state.selected_class_index).astype(int)
+    class_accuracy = accuracy_score(class_y_test, class_y_pred)
+    class_precision = precision_score(class_y_test, class_y_pred)
+    class_recall = recall_score(class_y_test, class_y_pred)
+    class_f1 = f1_score(class_y_test, class_y_pred)
+
+    st.subheader(f"Metrics for Class: {st.session_state.selected_class}")
+    col1, col2, col3, col4 = st.columns(4)
+    col1.metric("Accuracy", f"{class_accuracy:.2f}")
+    col2.metric("Precision", f"{class_precision:.2f}")
+    col3.metric("Recall", f"{class_recall:.2f}")
+    col4.metric("F1 Score", f"{class_f1:.2f}")
+    logging.info(f"Metrics for class {st.session_state.selected_class} displayed successfully.")
 
     # display confusion matrix
     st.subheader('Confusion Matrix')
@@ -208,5 +228,11 @@ if __name__ == "__main__":
 
     # show results
     if 'first_run' in st.session_state:
+
+        # display metrics for selected class
+        st.sidebar.header("Class Metrics")
+        st.session_state.selected_class = st.sidebar.selectbox("Select Class", st.session_state.unique_labels)
+        st.session_state.selected_class_index = list(st.session_state.unique_labels).index(st.session_state.selected_class)
+
         visualize()
         logging.info("Results displayed successfully.")
