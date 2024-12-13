@@ -14,28 +14,31 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 st.set_page_config(page_title="VisA Dashboard", layout="wide")
 st.title("VisA Dashboard")
 
+st.sidebar.header("Settings")
+
 # sidebar for data exploration
-st.sidebar.header("Data Settings")
+with st.sidebar.expander("Data", expanded=False):
+    # preset data
+    preset_target = 'app/lucas_organic_carbon/target/lucas_organic_carbon_target.csv'
+    preset_training = 'app/lucas_organic_carbon/training_test/compressed_data.csv'
 
-# preset data
-preset_target = 'app/lucas_organic_carbon/target/lucas_organic_carbon_target.csv'
-preset_training = 'app/lucas_organic_carbon/training_test/compressed_data.csv'
+    # file upload
+    target_file = st.file_uploader("Upload Target CSV", type=["csv"])
+    training_file = st.file_uploader("Upload Training CSV", type=["csv"])
 
-# file upload
-target_file = st.sidebar.file_uploader("Upload Target CSV", type=["csv"])
-training_file = st.sidebar.file_uploader("Upload Training CSV", type=["csv"])
+    if target_file is not None:
+        df_target = pd.read_csv(target_file)
+        st.session_state['target_data'] = df_target
+        logging.info("Added target file to session state.")
 
-if target_file is not None:
-    df_target = pd.read_csv(target_file)
-    st.session_state['target_data'] = df_target
-    logging.info("Added target file to session state.")
+    if training_file is not None:
+        df_training = pd.read_csv(training_file)
+        st.session_state['training_data'] = df_training
+        logging.info("Added training file to session state.")
+    
+    show_data = st.checkbox('Show raw data')
 
-if training_file is not None:
-    df_training = pd.read_csv(training_file)
-    st.session_state['training_data'] = df_training
-    logging.info("Added training file to session state.")
-
-if st.sidebar.checkbox('Show raw data'):
+if show_data:
     df_target = st.session_state.get('target_data', pd.read_csv(preset_target))
     df_training = st.session_state.get('training_data', pd.read_csv(preset_training))
     st.subheader('Training Data')
@@ -54,35 +57,10 @@ if 'data_percentage' not in st.session_state:
 if 'normalize_cm' not in st.session_state:
     st.session_state.normalize_cm = True
 
-# sidebar for user inputs
-st.sidebar.header("Model Settings")
-max_depth = st.sidebar.slider('Max Depth', min_value=1, max_value=200, value=st.session_state.max_depth)
-n_estimators = st.sidebar.slider('Number of Estimators', min_value=1, max_value=1000, value=st.session_state.n_estimators)
-data_percentage = st.sidebar.slider('Percentage of Data to Use', min_value=1, max_value=100, value=st.session_state.data_percentage)
-normalize_cm = st.sidebar.checkbox('Normalize Confusion Matrix', value=st.session_state.normalize_cm)
-
-# check if parameters have changed
-parameters_changed = (
-    max_depth != st.session_state.max_depth or
-    n_estimators != st.session_state.n_estimators or
-    data_percentage != st.session_state.data_percentage or
-    normalize_cm != st.session_state.normalize_cm
-)
-if parameters_changed:
-    st.sidebar.warning("Parameters have changed. New data is available. Please update.")
-
-# update session state
-st.session_state.max_depth = max_depth
-st.session_state.n_estimators = n_estimators
-st.session_state.data_percentage = data_percentage
-st.session_state.normalize_cm = normalize_cm
-
 # load data
 @st.cache_data(show_spinner=False)
 def load_data():
-
     # load data if not in session state
-
     if 'target_data' not in st.session_state:
         df_target = pd.read_csv(preset_target)
         st.session_state['target_data'] = df_target
@@ -92,15 +70,15 @@ def load_data():
         logging.info("Loaded target data from uploaded file.")
 
     if 'training_data' not in st.session_state:
-        df_training = pd.read_csv(preset_training) # NOTE: this is a compressed version of the data (for demo purposes)
+        df_training = pd.read_csv(preset_training)  # NOTE: this is a compressed version of the data (for demo purposes)
         st.session_state['training_data'] = df_training
         logging.info("Loaded training data from preset.")
     else:
         df_training = st.session_state['training_data']
         logging.info("Loaded training data from uploaded file.")
-    
+
     df_combined = pd.merge(df_training, df_target, left_index=True, right_index=True)
-    
+
     return df_combined
 
 # prepare data
@@ -132,49 +110,68 @@ def train_model(X_train, y_train, max_depth, n_estimators):
     rf_classifier.fit(X_train, y_train)
     return rf_classifier
 
-# update data and model
-if st.sidebar.button('Update'):
+# sidebar for user inputs
+with st.sidebar.expander("Model", expanded=False):
+    max_depth = st.slider('Max Depth', min_value=1, max_value=200, value=st.session_state.max_depth)
+    n_estimators = st.slider('Number of Estimators', min_value=1, max_value=1000, value=st.session_state.n_estimators)
+    data_percentage = st.slider('Percentage of Data to Use', min_value=1, max_value=100, value=st.session_state.data_percentage)
+    normalize_cm = st.checkbox('Normalize Confusion Matrix', value=st.session_state.normalize_cm)
 
-    # spinner while loading data
-    with st.spinner('Preparing the data...'):
-        df_combined = load_data()
-        X_train, st.session_state.X_test, y_train, st.session_state.y_test, label_encoder = prepare_data(df_combined, data_percentage)
-        logging.info("Data prepared successfully.")
+    # check if parameters have changed
+    parameters_changed = (
+        max_depth != st.session_state.max_depth or
+        n_estimators != st.session_state.n_estimators or
+        data_percentage != st.session_state.data_percentage or
+        normalize_cm != st.session_state.normalize_cm
+    )
+    if parameters_changed:
+        st.warning("Parameters have changed. New data is available. Please update.")
 
-    # spinner while training model
-    with st.spinner('Training the model...'):
-        rf_classifier = train_model(X_train, y_train, max_depth, n_estimators)
-        st.session_state.y_pred = rf_classifier.predict(st.session_state.X_test)
-        logging.info("Model trained successfully.")
+    # update session state
+    st.session_state.max_depth = max_depth
+    st.session_state.n_estimators = n_estimators
+    st.session_state.data_percentage = data_percentage
+    st.session_state.normalize_cm = normalize_cm
 
-    # spinner while evaluating
-    with st.spinner('Evaluating the model...'):
+    # update data and model
+    if st.button('Update'):
 
-        # compute metrics (and save in session state)
-        st.session_state.accuracy = accuracy_score(st.session_state.y_test, st.session_state.y_pred)
-        st.session_state.precision = precision_score(st.session_state.y_test, st.session_state.y_pred, average='weighted')
-        st.session_state.recall = recall_score(st.session_state.y_test, st.session_state.y_pred, average='weighted')
-        st.session_state.f1 = f1_score(st.session_state.y_test, st.session_state.y_pred, average='weighted')
+        # spinner while loading data
+        with st.spinner('Preparing the data...'):
+            df_combined = load_data()
+            X_train, st.session_state.X_test, y_train, st.session_state.y_test, label_encoder = prepare_data(df_combined, data_percentage)
+            logging.info("Data prepared successfully.")
 
-        # actual label names (and save in session state)
-        st.session_state.unique_labels = label_encoder.classes_
+        # spinner while training model
+        with st.spinner('Training the model...'):
+            rf_classifier = train_model(X_train, y_train, max_depth, n_estimators)
+            st.session_state.y_pred = rf_classifier.predict(st.session_state.X_test)
+            logging.info("Model trained successfully.")
 
-        # compute confusion matrix (and save in session state)
-        if normalize_cm:
-            st.session_state.cm = confusion_matrix(st.session_state.y_test, st.session_state.y_pred, labels=range(len(st.session_state.unique_labels)), normalize='true')
-        else:
-            st.session_state.cm = confusion_matrix(st.session_state.y_test, st.session_state.y_pred, labels=range(len(st.session_state.unique_labels)))
+        # spinner while evaluating
+        with st.spinner('Evaluating the model...'):
+            # compute metrics (and save in session state)
+            st.session_state.accuracy = accuracy_score(st.session_state.y_test, st.session_state.y_pred)
+            st.session_state.precision = precision_score(st.session_state.y_test, st.session_state.y_pred, average='weighted')
+            st.session_state.recall = recall_score(st.session_state.y_test, st.session_state.y_pred, average='weighted')
+            st.session_state.f1 = f1_score(st.session_state.y_test, st.session_state.y_pred, average='weighted')
 
-        logging.info("Model evaluated successfully.")
-    
-    st.session_state.first_run = False
+            # actual label names (and save in session state)
+            st.session_state.unique_labels = label_encoder.classes_
+
+            # compute confusion matrix (and save in session state)
+            if normalize_cm:
+                st.session_state.cm = confusion_matrix(st.session_state.y_test, st.session_state.y_pred, labels=range(len(st.session_state.unique_labels)), normalize='true')
+            else:
+                st.session_state.cm = confusion_matrix(st.session_state.y_test, st.session_state.y_pred, labels=range(len(st.session_state.unique_labels)))
+
+            logging.info("Model evaluated successfully.")
+        
+        st.session_state.first_run = False
 
 # show results
 def visualize():
-
     # display metrics (in columns)
-
-    # overall metrics 
     st.subheader("Overall Metrics")
     col1, col2, col3, col4 = st.columns(4)
     col1.metric("Accuracy", f"{st.session_state.get('accuracy', 0):.2f}")
@@ -184,7 +181,6 @@ def visualize():
     logging.info("Metrics displayed successfully.")
 
     # metrics for selected class
-
     class_y_test = (st.session_state.y_test == st.session_state.selected_class_index).astype(int)
     class_y_pred = (st.session_state.y_pred == st.session_state.selected_class_index).astype(int)
     class_accuracy = accuracy_score(class_y_test, class_y_pred)
@@ -232,7 +228,6 @@ def visualize():
     logging.info("Confusion matrix displayed successfully.")
 
 if __name__ == "__main__":
-
     # show placeholder
     if 'first_run' not in st.session_state:
         placeholder = st.empty()
@@ -242,10 +237,10 @@ if __name__ == "__main__":
     # show results
     if 'first_run' in st.session_state:
 
-        # display metrics for selected class
-        st.sidebar.header("Class Metrics")
-        st.session_state.selected_class = st.sidebar.selectbox("Select Class", st.session_state.unique_labels)
-        st.session_state.selected_class_index = list(st.session_state.unique_labels).index(st.session_state.selected_class)
+        # allow for customization of viewing settings
+        with st.sidebar.expander("Viewer", expanded=False):
+            st.session_state.selected_class = st.selectbox("Select Class", st.session_state.unique_labels)
+            st.session_state.selected_class_index = list(st.session_state.unique_labels).index(st.session_state.selected_class)
 
         visualize()
         logging.info("Results displayed successfully.")
