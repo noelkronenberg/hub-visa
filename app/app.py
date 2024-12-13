@@ -135,7 +135,7 @@ with st.sidebar.expander("Model", expanded=True):
     st.session_state.normalize_cm = normalize_cm
 
     # update data and model
-    if st.button('Update'):
+    if st.button('Update Model'):
 
         # spinner while loading data
         with st.spinner('Preparing the data...'):
