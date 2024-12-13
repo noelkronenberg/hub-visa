@@ -39,6 +39,7 @@ with st.sidebar.expander("Data", expanded=False):
     show_data = st.checkbox('Show raw data')
 
 if show_data:
+    with st.spinner('Loading the data...'):
         df_target = st.session_state.get('target_data', pd.read_csv(preset_target))
         df_training = st.session_state.get('training_data', pd.read_csv(preset_training))
         st.subheader('Training Data')
