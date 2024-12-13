@@ -192,6 +192,7 @@ def display_class_counts(y_test, unique_labels):
 
 # show results
 def visualize():
+    
     # display metrics (in columns)
     st.subheader("Overall Metrics")
     col1, col2, col3, col4 = st.columns(4)
@@ -200,6 +201,8 @@ def visualize():
     col3.metric("Recall", f"{st.session_state.get('recall', 0):.2f}")
     col4.metric("F1 Score", f"{st.session_state.get('f1', 0):.2f}")
     logging.info("Metrics displayed successfully.")
+
+    st.markdown("---")
 
     # metrics for selected class
 
@@ -218,8 +221,12 @@ def visualize():
     col4.metric("F1 Score", f"{class_f1:.2f}")
     logging.info(f"Metrics for class {st.session_state.selected_class} displayed successfully.")
 
+    st.markdown("---")
+
     # display class counts
     display_class_counts(st.session_state.y_test, st.session_state.unique_labels)
+
+    st.markdown("---")
 
     # confusion matrix: display data
     st.subheader('Confusion Matrix')
