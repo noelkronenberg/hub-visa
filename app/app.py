@@ -158,7 +158,6 @@ with st.sidebar.expander("Model", expanded=True):
             st.session_state.f1 = f1_score(st.session_state.y_test, st.session_state.y_pred, average='weighted')
 
             # actual label names (and save in session state)
-            st.session_state.label_encoder = label_encoder
             st.session_state.unique_labels = label_encoder.classes_
 
             # compute confusion matrix (and save in session state)
@@ -171,23 +170,25 @@ with st.sidebar.expander("Model", expanded=True):
         
         st.session_state.first_run = False
 
-def display_class_counts(y_test, label_encoder):
+def display_class_counts(y_test, unique_labels):
+    
     # count instances of each class in the test set
-    class_counts = pd.Series(y_test).value_counts().sort_index()
-    class_labels = label_encoder.inverse_transform(class_counts.index)
+    class_counts = pd.Series(y_test).value_counts().reindex(range(len(unique_labels)), fill_value=0)
 
     # display the class counts in columns
     st.subheader("Class Counts")
     
     # create columns for each class
-    cols = st.columns(len(class_counts))
-    for col, (class_label, count) in zip(cols, zip(class_labels, class_counts)):
+    cols = st.columns(len(unique_labels))
+    for col, (class_index, count) in zip(cols, class_counts.items()):
+        class_label = unique_labels[class_index]
         if class_label == st.session_state.selected_class:
-            col.metric(class_label, f"{count}", delta="‎ ", delta_color="inverse") # highlight the selected class (with a empty delta)
+            col.metric(class_label, f"{count}", delta="‎ ", delta_color="inverse") # highlight the selected class (with an empty delta)
         else:
             col.metric(class_label, f"{count}")
 
     logging.info("Class counts displayed successfully.")
+
 
 # show results
 def visualize():
@@ -218,7 +219,7 @@ def visualize():
     logging.info(f"Metrics for class {st.session_state.selected_class} displayed successfully.")
 
     # display class counts
-    display_class_counts(st.session_state.y_test, st.session_state.label_encoder)
+    display_class_counts(st.session_state.y_test, st.session_state.unique_labels)
 
     # confusion matrix: display data
     st.subheader('Confusion Matrix')
