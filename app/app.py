@@ -215,6 +215,19 @@ def visualize():
         xaxis=dict(tickmode='array', tickvals=list(range(len(st.session_state.unique_labels))), ticktext=st.session_state.unique_labels),
         yaxis=dict(tickmode='array', tickvals=list(range(len(st.session_state.unique_labels))), ticktext=st.session_state.unique_labels)
     )
+    # add rectangles to highlight the selected class (row and column)
+    fig.add_shape(
+        type="rect",
+        x0=-0.5, x1=len(st.session_state.unique_labels) - 0.5,
+        y0=st.session_state.selected_class_index - 0.5, y1=st.session_state.selected_class_index + 0.5,
+        line=dict(color="red", width=3)
+    )
+    fig.add_shape(
+        type="rect",
+        x0=st.session_state.selected_class_index - 0.5, x1=st.session_state.selected_class_index + 0.5,
+        y0=-0.5, y1=len(st.session_state.unique_labels) - 0.5,
+        line=dict(color="red", width=3)
+    )
     st.plotly_chart(fig)
     logging.info("Confusion matrix displayed successfully.")
 
