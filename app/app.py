@@ -181,6 +181,7 @@ def visualize():
     logging.info("Metrics displayed successfully.")
 
     # metrics for selected class
+    
     class_y_test = (st.session_state.y_test == st.session_state.selected_class_index).astype(int)
     class_y_pred = (st.session_state.y_pred == st.session_state.selected_class_index).astype(int)
     class_accuracy = accuracy_score(class_y_test, class_y_pred)
@@ -196,34 +197,48 @@ def visualize():
     col4.metric("F1 Score", f"{class_f1:.2f}")
     logging.info(f"Metrics for class {st.session_state.selected_class} displayed successfully.")
 
-    # display confusion matrix
+    # confusion matrix: display data
     st.subheader('Confusion Matrix')
     fig = go.Figure(data=go.Heatmap(
         z=st.session_state.cm,
         x=[f'Predicted: {label}' for label in st.session_state.unique_labels],
         y=[f'Actual: {label}' for label in st.session_state.unique_labels],
-        colorscale='Viridis',
+        colorscale='Blues',
         showscale=True
     ))
+
+    # confusion matrix: improve layout 
     fig.update_layout(
         xaxis_title='Predicted Label',
         yaxis_title='Actual Label',
         xaxis=dict(tickmode='array', tickvals=list(range(len(st.session_state.unique_labels))), ticktext=st.session_state.unique_labels),
-        yaxis=dict(tickmode='array', tickvals=list(range(len(st.session_state.unique_labels))), ticktext=st.session_state.unique_labels)
+        yaxis=dict(tickmode='array', tickvals=list(range(len(st.session_state.unique_labels))), ticktext=st.session_state.unique_labels),
     )
-    # add rectangles to highlight the selected class (row and column)
+
+    # confusion matrix: add a rectangle shape to create a border effect
+    fig.add_shape(
+        type="rect",
+        x0=-0.5, x1=len(st.session_state.unique_labels) - 0.5,
+        y0=-0.5, y1=len(st.session_state.unique_labels) - 0.5,
+        line=dict(color="black", width=1),
+        fillcolor='rgba(0,0,0,0)'
+    )
+
+    # confusion matrix: add rectangles to highlight the selected class (row and column)
     fig.add_shape(
         type="rect",
         x0=-0.5, x1=len(st.session_state.unique_labels) - 0.5,
         y0=st.session_state.selected_class_index - 0.5, y1=st.session_state.selected_class_index + 0.5,
-        line=dict(color="red", width=3)
+        line=dict(color="red", width=1)
     )
     fig.add_shape(
         type="rect",
         x0=st.session_state.selected_class_index - 0.5, x1=st.session_state.selected_class_index + 0.5,
         y0=-0.5, y1=len(st.session_state.unique_labels) - 0.5,
-        line=dict(color="red", width=3)
+        line=dict(color="red", width=1)
     )
+    
+    # confusion matrix: display the figure
     st.plotly_chart(fig)
     logging.info("Confusion matrix displayed successfully.")
 
