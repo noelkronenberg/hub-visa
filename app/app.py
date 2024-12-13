@@ -158,6 +158,7 @@ with st.sidebar.expander("Model", expanded=True):
             st.session_state.f1 = f1_score(st.session_state.y_test, st.session_state.y_pred, average='weighted')
 
             # actual label names (and save in session state)
+            st.session_state.label_encoder = label_encoder
             st.session_state.unique_labels = label_encoder.classes_
 
             # compute confusion matrix (and save in session state)
@@ -169,6 +170,24 @@ with st.sidebar.expander("Model", expanded=True):
             logging.info("Model evaluated successfully.")
         
         st.session_state.first_run = False
+
+def display_class_counts(y_test, label_encoder):
+    # count instances of each class in the test set
+    class_counts = pd.Series(y_test).value_counts().sort_index()
+    class_labels = label_encoder.inverse_transform(class_counts.index)
+
+    # display the class counts in columns
+    st.subheader("Class Counts")
+    
+    # create columns for each class
+    cols = st.columns(len(class_counts))
+    for col, (class_label, count) in zip(cols, zip(class_labels, class_counts)):
+        if class_label == st.session_state.selected_class:
+            col.metric(class_label, f"{count}", delta="‎ ", delta_color="inverse") # highlight the selected class (with a empty delta)
+        else:
+            col.metric(class_label, f"{count}")
+
+    logging.info("Class counts displayed successfully.")
 
 # show results
 def visualize():
@@ -197,6 +216,9 @@ def visualize():
     col3.metric("Recall", f"{class_recall:.2f}")
     col4.metric("F1 Score", f"{class_f1:.2f}")
     logging.info(f"Metrics for class {st.session_state.selected_class} displayed successfully.")
+
+    # display class counts
+    display_class_counts(st.session_state.y_test, st.session_state.label_encoder)
 
     # confusion matrix: display data
     st.subheader('Confusion Matrix')
