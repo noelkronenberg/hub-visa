@@ -57,6 +57,12 @@ if 'data_percentage' not in st.session_state:
     st.session_state.data_percentage = 1
 if 'normalize_cm' not in st.session_state:
     st.session_state.normalize_cm = True
+if 'min_samples_split' not in st.session_state:
+    st.session_state.min_samples_split = 2
+if 'min_samples_leaf' not in st.session_state:
+    st.session_state.min_samples_leaf = 1
+if 'max_features' not in st.session_state:
+    st.session_state.max_features = 'sqrt'
 
 # load data
 @st.cache_data(show_spinner=False)
@@ -106,15 +112,26 @@ def prepare_data(df_combined, data_percentage):
 
 # train model
 @st.cache_resource(show_spinner=False)
-def train_model(X_train, y_train, max_depth, n_estimators):
-    rf_classifier = RandomForestClassifier(max_depth=max_depth, n_estimators=n_estimators)
+def train_model(X_train, y_train, max_depth, n_estimators, min_samples_split, min_samples_leaf, max_features):
+    rf_classifier = RandomForestClassifier(
+        max_depth=max_depth,
+        n_estimators=n_estimators,
+        min_samples_split=min_samples_split,
+        min_samples_leaf=min_samples_leaf,
+        max_features=max_features
+    )
     rf_classifier.fit(X_train, y_train)
     return rf_classifier
 
 # sidebar for user inputs
 with st.sidebar.expander("Model", expanded=True):
+    
     max_depth = st.slider('Max Depth', min_value=1, max_value=200, value=st.session_state.max_depth)
     n_estimators = st.slider('Number of Estimators', min_value=1, max_value=1000, value=st.session_state.n_estimators)
+    min_samples_split = st.slider('Min Samples Split', min_value=2, max_value=20, value=st.session_state.min_samples_split)
+    min_samples_leaf = st.slider('Min Samples Leaf', min_value=1, max_value=20, value=st.session_state.min_samples_leaf)
+    max_features = st.selectbox('Max Features', options=['sqrt', 'log2'], index=['sqrt', 'log2'].index(st.session_state.max_features))
+
     data_percentage = st.slider('Percentage of Data to Use', min_value=1, max_value=100, value=st.session_state.data_percentage)
     normalize_cm = st.checkbox('Normalize Confusion Matrix', value=st.session_state.normalize_cm)
 
@@ -123,7 +140,10 @@ with st.sidebar.expander("Model", expanded=True):
         max_depth != st.session_state.max_depth or
         n_estimators != st.session_state.n_estimators or
         data_percentage != st.session_state.data_percentage or
-        normalize_cm != st.session_state.normalize_cm
+        normalize_cm != st.session_state.normalize_cm or
+        min_samples_split != st.session_state.min_samples_split or
+        min_samples_leaf != st.session_state.min_samples_leaf or
+        max_features != st.session_state.max_features
     )
     if parameters_changed:
         st.warning("Parameters have changed. New data is available. Please update.")
@@ -133,6 +153,9 @@ with st.sidebar.expander("Model", expanded=True):
     st.session_state.n_estimators = n_estimators
     st.session_state.data_percentage = data_percentage
     st.session_state.normalize_cm = normalize_cm
+    st.session_state.min_samples_split = min_samples_split
+    st.session_state.min_samples_leaf = min_samples_leaf
+    st.session_state.max_features = max_features
 
     # update data and model
     if st.button('Update Model'):
@@ -145,7 +168,7 @@ with st.sidebar.expander("Model", expanded=True):
 
         # spinner while training model
         with st.spinner('Training the model...'):
-            rf_classifier = train_model(X_train, y_train, max_depth, n_estimators)
+            rf_classifier = train_model(X_train, y_train, max_depth, n_estimators, min_samples_split, min_samples_leaf, max_features)
             st.session_state.y_pred = rf_classifier.predict(st.session_state.X_test)
             logging.info("Model trained successfully.")
 
