@@ -194,24 +194,34 @@ with st.sidebar.expander("Model", expanded=True):
         st.session_state.first_run = False
 
 def display_class_counts(y_test, unique_labels):
-    
+
     # count instances of each class in the test set
     class_counts = pd.Series(y_test).value_counts().reindex(range(len(unique_labels)), fill_value=0)
 
-    # display the class counts in columns
-    st.subheader("Class Counts")
-    
-    # create columns for each class
-    cols = st.columns(len(unique_labels))
-    for col, (class_index, count) in zip(cols, class_counts.items()):
-        class_label = unique_labels[class_index]
-        if class_label == st.session_state.selected_class:
-            col.metric(class_label, f"{count}", delta="‎ ", delta_color="inverse") # highlight the selected class (with an empty delta)
-        else:
-            col.metric(class_label, f"{count}")
+    # sort by count
+    sorted_counts = class_counts.sort_values(ascending=False)
+    sorted_labels = [unique_labels[i] for i in sorted_counts.index]
 
-    logging.info("Class counts displayed successfully.")
+    # create a bar chart
+    fig = go.Figure(data=[
+        go.Bar(
+            x=sorted_labels, 
+            y=sorted_counts.values, 
+            marker_color=['red' if label == st.session_state.selected_class else 'black' for label in sorted_labels]) # highlight selected class
+    ])
 
+    # update layout
+    fig.update_layout(
+        xaxis_title="Class",
+        yaxis_title="Count",
+        margin=dict(l=20, r=20, t=20, b=20),
+        height=300 # reduce height
+    )
+
+    # display the figure
+    st.subheader('Class Counts')
+    st.plotly_chart(fig)
+    logging.info("Class counts displayed as histogram successfully.")
 
 # show results
 def visualize():
