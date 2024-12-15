@@ -17,7 +17,7 @@ st.title("VisA Dashboard")
 st.sidebar.header("Settings")
 
 # sidebar for data exploration
-with st.sidebar.expander("Data", expanded=False):
+with st.sidebar.expander("**Data**", expanded=False):
     # preset data
     preset_target = 'app/lucas_organic_carbon/target/lucas_organic_carbon_target.csv'
     preset_training = 'app/lucas_organic_carbon/training_test/compressed_data.csv'
@@ -42,10 +42,13 @@ if show_data:
     with st.spinner('Loading the data...'):
         df_target = st.session_state.get('target_data', pd.read_csv(preset_target))
         df_training = st.session_state.get('training_data', pd.read_csv(preset_training))
-        st.subheader('Training Data')
-        st.write(df_training)
-        st.subheader('Target Data')
-        st.write(df_target)
+        
+        with st.expander("**Training Data**", expanded=False):
+            st.write(df_training)
+        
+        with st.expander("**Target Data**", expanded=False):
+            st.write(df_target)
+        
         logging.info("Raw data displayed successfully.")
 
 # initialize session state with default parameters
@@ -124,7 +127,7 @@ def train_model(X_train, y_train, max_depth, n_estimators, min_samples_split, mi
     return rf_classifier
 
 # sidebar for user inputs
-with st.sidebar.expander("Model", expanded=True):
+with st.sidebar.expander("**Model**", expanded=True):
     
     max_depth = st.slider('Max Depth', min_value=1, max_value=200, value=st.session_state.max_depth)
     n_estimators = st.slider('Number of Estimators', min_value=1, max_value=1000, value=st.session_state.n_estimators)
@@ -229,7 +232,6 @@ def display_class_counts(y_test, y_pred, unique_labels):
     )
 
     # display the figure
-    st.subheader('Class Counts')
     st.plotly_chart(fig)
     logging.info("Class counts displayed as histogram successfully.")
 
@@ -237,104 +239,94 @@ def display_class_counts(y_test, y_pred, unique_labels):
 def visualize():
     
     # display overall metrics
-    st.subheader("Overall Metrics")
-    col1, col2, col3, col4 = st.columns(4)
-    col1.metric("Accuracy", f"{st.session_state.get('accuracy', 0):.2f}")
-    col2.metric("Precision", f"{st.session_state.get('precision', 0):.2f}")
-    col3.metric("Recall", f"{st.session_state.get('recall', 0):.2f}")
-    col4.metric("F1 Score", f"{st.session_state.get('f1', 0):.2f}")
-    logging.info("Overall metrics displayed successfully.")
+    with st.expander("**Overall Metrics**", expanded=True):
+        col1, col2, col3, col4 = st.columns(4)
+        col1.metric("Accuracy", f"{st.session_state.get('accuracy', 0):.2f}")
+        col2.metric("Precision", f"{st.session_state.get('precision', 0):.2f}")
+        col3.metric("Recall", f"{st.session_state.get('recall', 0):.2f}")
+        col4.metric("F1 Score", f"{st.session_state.get('f1', 0):.2f}")
+        logging.info("Overall metrics displayed successfully.")
 
-    st.markdown("---")
+    with st.expander(f"**Metrics for Class: {st.session_state.selected_class}**", expanded=True):
+        class_y_test = (st.session_state.y_test == st.session_state.selected_class_index).astype(int)
+        class_y_pred = (st.session_state.y_pred == st.session_state.selected_class_index).astype(int)
+        class_accuracy = accuracy_score(class_y_test, class_y_pred)
+        class_precision = precision_score(class_y_test, class_y_pred)
+        class_recall = recall_score(class_y_test, class_y_pred)
+        class_f1 = f1_score(class_y_test, class_y_pred)
 
-    # metrics for selected class
+        cm_error = False
+        try:
+            tn, fp, fn, tp = confusion_matrix(class_y_test, class_y_pred).ravel()
+        except ValueError as e:
+            cm_error = True
+            tn, fp, fn, tp = 0, 0, 0, 0
+            logging.error(f"Error in computing confusion matrix: {e}")
 
-    class_y_test = (st.session_state.y_test == st.session_state.selected_class_index).astype(int)
-    class_y_pred = (st.session_state.y_pred == st.session_state.selected_class_index).astype(int)
-    class_accuracy = accuracy_score(class_y_test, class_y_pred)
-    class_precision = precision_score(class_y_test, class_y_pred)
-    class_recall = recall_score(class_y_test, class_y_pred)
-    class_f1 = f1_score(class_y_test, class_y_pred)
+        col1, col2, col3, col4 = st.columns(4)
+        col1.metric("Accuracy", f"{class_accuracy:.2f}")
+        col2.metric("Precision", f"{class_precision:.2f}")
+        col3.metric("Recall", f"{class_recall:.2f}")
+        col4.metric("F1 Score", f"{class_f1:.2f}")
 
-    st.subheader(f"Metrics for Class: {st.session_state.selected_class}")
+        col1, col2, col3, col4 = st.columns(4)
+        col1.metric("True Positives", tp)
+        col2.metric("True Negatives", tn)
+        col3.metric("False Positives", fp)
+        col4.metric("False Negatives", fn)
 
-    cm_error = False
-    try:
-        tn, fp, fn, tp = confusion_matrix(class_y_test, class_y_pred).ravel()
-    except ValueError as e:
-        cm_error = True
-        tn, fp, fn, tp = 0, 0, 0, 0
-        logging.error(f"Error in computing confusion matrix: {e}")
+        if cm_error:
+            st.error("Confusion matrix did not return enough values. Metrics may not be accurate.")
 
-    col1, col2, col3, col4 = st.columns(4)
-    col1.metric("Accuracy", f"{class_accuracy:.2f}")
-    col2.metric("Precision", f"{class_precision:.2f}")
-    col3.metric("Recall", f"{class_recall:.2f}")
-    col4.metric("F1 Score", f"{class_f1:.2f}")
+        logging.info(f"Metrics for class {st.session_state.selected_class} displayed successfully.")    
 
-    col1, col2, col3, col4 = st.columns(4)
-    col1.metric("True Positives", tp)
-    col2.metric("True Negatives", tn)
-    col3.metric("False Positives", fp)
-    col4.metric("False Negatives", fn)
+    with st.expander("**Class Counts**", expanded=True):
+        display_class_counts(st.session_state.y_test, st.session_state.y_pred, st.session_state.unique_labels)
 
-    if cm_error:
-        st.error("Confusion matrix did not return enough values. Metrics may not be accurate.")
+    with st.expander("**Confusion Matrix**", expanded=True):
+        fig = go.Figure(data=go.Heatmap(
+            z=st.session_state.cm,
+            x=[f'Predicted: {label}' for label in st.session_state.unique_labels],
+            y=[f'Actual: {label}' for label in st.session_state.unique_labels],
+            colorscale='Blues',
+            showscale=True
+        ))
 
-    logging.info(f"Metrics for class {st.session_state.selected_class} displayed successfully.")    
+        # confusion matrix: improve layout 
+        fig.update_layout(
+            xaxis_title='Predicted Label',
+            yaxis_title='Actual Label',
+            xaxis=dict(tickmode='array', tickvals=list(range(len(st.session_state.unique_labels))), ticktext=st.session_state.unique_labels),
+            yaxis=dict(tickmode='array', tickvals=list(range(len(st.session_state.unique_labels))), ticktext=st.session_state.unique_labels),
+            margin=dict(l=20, r=20, t=20, b=20)
+        )
 
-    st.markdown("---")
+        # confusion matrix: add a rectangle shape to create a border effect
+        fig.add_shape(
+            type="rect",
+            x0=-0.5, x1=len(st.session_state.unique_labels) - 0.5,
+            y0=-0.5, y1=len(st.session_state.unique_labels) - 0.5,
+            line=dict(color="black", width=1),
+            fillcolor='rgba(0,0,0,0)'
+        )
 
-    # display class counts
-    display_class_counts(st.session_state.y_test, st.session_state.y_pred, st.session_state.unique_labels)
-
-    st.markdown("---")
-
-    # confusion matrix: display data
-    st.subheader('Confusion Matrix')
-    fig = go.Figure(data=go.Heatmap(
-        z=st.session_state.cm,
-        x=[f'Predicted: {label}' for label in st.session_state.unique_labels],
-        y=[f'Actual: {label}' for label in st.session_state.unique_labels],
-        colorscale='Blues',
-        showscale=True
-    ))
-
-    # confusion matrix: improve layout 
-    fig.update_layout(
-        xaxis_title='Predicted Label',
-        yaxis_title='Actual Label',
-        xaxis=dict(tickmode='array', tickvals=list(range(len(st.session_state.unique_labels))), ticktext=st.session_state.unique_labels),
-        yaxis=dict(tickmode='array', tickvals=list(range(len(st.session_state.unique_labels))), ticktext=st.session_state.unique_labels),
-        margin=dict(l=20, r=20, t=20, b=20)
-    )
-
-    # confusion matrix: add a rectangle shape to create a border effect
-    fig.add_shape(
-        type="rect",
-        x0=-0.5, x1=len(st.session_state.unique_labels) - 0.5,
-        y0=-0.5, y1=len(st.session_state.unique_labels) - 0.5,
-        line=dict(color="black", width=1),
-        fillcolor='rgba(0,0,0,0)'
-    )
-
-    # confusion matrix: add rectangles to highlight the selected class (row and column)
-    fig.add_shape(
-        type="rect",
-        x0=-0.5, x1=len(st.session_state.unique_labels) - 0.5,
-        y0=st.session_state.selected_class_index - 0.5, y1=st.session_state.selected_class_index + 0.5,
-        line=dict(color="red", width=1)
-    )
-    fig.add_shape(
-        type="rect",
-        x0=st.session_state.selected_class_index - 0.5, x1=st.session_state.selected_class_index + 0.5,
-        y0=-0.5, y1=len(st.session_state.unique_labels) - 0.5,
-        line=dict(color="red", width=1)
-    )
-    
-    # confusion matrix: display the figure
-    st.plotly_chart(fig)
-    logging.info("Confusion matrix displayed successfully.")
+        # confusion matrix: add rectangles to highlight the selected class (row and column)
+        fig.add_shape(
+            type="rect",
+            x0=-0.5, x1=len(st.session_state.unique_labels) - 0.5,
+            y0=st.session_state.selected_class_index - 0.5, y1=st.session_state.selected_class_index + 0.5,
+            line=dict(color="red", width=1)
+        )
+        fig.add_shape(
+            type="rect",
+            x0=st.session_state.selected_class_index - 0.5, x1=st.session_state.selected_class_index + 0.5,
+            y0=-0.5, y1=len(st.session_state.unique_labels) - 0.5,
+            line=dict(color="red", width=1)
+        )
+        
+        # confusion matrix: display the figure
+        st.plotly_chart(fig)
+        logging.info("Confusion matrix displayed successfully.")
 
 if __name__ == "__main__":
     # show placeholder
@@ -347,7 +339,7 @@ if __name__ == "__main__":
     if 'first_run' in st.session_state:
 
         # allow for customization of viewing settings
-        with st.sidebar.expander("Viewer", expanded=False):
+        with st.sidebar.expander("**Viewer**", expanded=False):
             st.session_state.selected_class = st.selectbox("Select Class", st.session_state.unique_labels)
             st.session_state.selected_class_index = list(st.session_state.unique_labels).index(st.session_state.selected_class)
 
