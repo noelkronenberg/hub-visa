@@ -2,9 +2,9 @@
 
 ## Showcase
 
-![Demo Video](/static/241215_demo_v1.mp4)
+https://github.com/user-attachments/assets/27bd339a-1999-416d-a43f-ba3ad347cadf
 
-> **Last video update:** 15.12.2024 (commit ```1fe9a5b```)
+> Video updated on December 15th 2024 (commit ```1fe9a5b```). In case the video is not accessible, you may view it via [this](https://drive.google.com/drive/folders/132BcJ8Trho9_eRaCsOj504YdOCG96X35?usp=sharing) link.
 
 ## Structure of Repository
 
