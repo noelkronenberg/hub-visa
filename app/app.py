@@ -255,9 +255,16 @@ def visualize():
     class_precision = precision_score(class_y_test, class_y_pred)
     class_recall = recall_score(class_y_test, class_y_pred)
     class_f1 = f1_score(class_y_test, class_y_pred)
-    tn, fp, fn, tp = confusion_matrix(class_y_test, class_y_pred).ravel()
 
     st.subheader(f"Metrics for Class: {st.session_state.selected_class}")
+
+    cm_error = False
+    try:
+        tn, fp, fn, tp = confusion_matrix(class_y_test, class_y_pred).ravel()
+    except ValueError as e:
+        cm_error = True
+        tn, fp, fn, tp = 0, 0, 0, 0
+        logging.error(f"Error in computing confusion matrix: {e}")
 
     col1, col2, col3, col4 = st.columns(4)
     col1.metric("Accuracy", f"{class_accuracy:.2f}")
@@ -270,6 +277,9 @@ def visualize():
     col2.metric("True Negatives", tn)
     col3.metric("False Positives", fp)
     col4.metric("False Negatives", fn)
+
+    if cm_error:
+        st.error("Confusion matrix did not return enough values. Metrics may not be accurate.")
 
     logging.info(f"Metrics for class {st.session_state.selected_class} displayed successfully.")    
 
