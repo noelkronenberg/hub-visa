@@ -70,3 +70,4 @@
 | A1  |                          | Adding a bar chart for the comparison for predicted and actual class counts. | done   | Aodi Chen       |
 | A2  |                          | Adding confusion matrix metrics.                                             | done   | Aodi Chen       |
 | A3  |                          | Adding collapsible sections.                                                 | done   | Noel Kronenberg |
+| A4  |                          | Preselect class with lowest accuracy.                                        | done   | Noel Kronenberg |
