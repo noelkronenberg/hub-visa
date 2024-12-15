@@ -1,5 +1,11 @@
 # Development and Implementation Documentation
 
+## Showcase
+
+![Demo Video](/static/241215_demo_v1.mp4)
+
+> **Last video update:** 15.12.2024 (commit ```1fe9a5b```)
+
 ## Structure of Repository
 
 - ```.streamlit``` Streamlit configuration (e.g. server settings) 
