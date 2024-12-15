@@ -31,7 +31,7 @@
 | C5  | Dynamic Model Training   | Allow user to change model parameters to dynamically retrain model.                       | done              | M4        |
 | C6  | Faster UX                | Enabling faster loading times via caching of resources and transparent loading processes. | done              | M4        |
 | C7  | Class Selection          | Allow user to select specific target class to view evaluation metrics regarding it.       | done              | M4        |
-| C8  | Improved Metrics Display | Improve readability of key evaluation metrics.                                            | under development | M4        |
+| C8  | Improved Metrics Display | Improve readability of key evaluation metrics.                                            | done              | M4        |
 
 
 ## Major Implementation Activities
