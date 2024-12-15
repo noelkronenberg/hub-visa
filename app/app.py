@@ -236,14 +236,14 @@ def display_class_counts(y_test, y_pred, unique_labels):
 # show results
 def visualize():
     
-    # display metrics (in columns)
+    # display overall metrics
     st.subheader("Overall Metrics")
     col1, col2, col3, col4 = st.columns(4)
     col1.metric("Accuracy", f"{st.session_state.get('accuracy', 0):.2f}")
     col2.metric("Precision", f"{st.session_state.get('precision', 0):.2f}")
     col3.metric("Recall", f"{st.session_state.get('recall', 0):.2f}")
     col4.metric("F1 Score", f"{st.session_state.get('f1', 0):.2f}")
-    logging.info("Metrics displayed successfully.")
+    logging.info("Overall metrics displayed successfully.")
 
     st.markdown("---")
 
@@ -255,14 +255,23 @@ def visualize():
     class_precision = precision_score(class_y_test, class_y_pred)
     class_recall = recall_score(class_y_test, class_y_pred)
     class_f1 = f1_score(class_y_test, class_y_pred)
+    tn, fp, fn, tp = confusion_matrix(class_y_test, class_y_pred).ravel()
 
     st.subheader(f"Metrics for Class: {st.session_state.selected_class}")
+
     col1, col2, col3, col4 = st.columns(4)
     col1.metric("Accuracy", f"{class_accuracy:.2f}")
     col2.metric("Precision", f"{class_precision:.2f}")
     col3.metric("Recall", f"{class_recall:.2f}")
     col4.metric("F1 Score", f"{class_f1:.2f}")
-    logging.info(f"Metrics for class {st.session_state.selected_class} displayed successfully.")
+
+    col1, col2, col3, col4 = st.columns(4)
+    col1.metric("True Positives", tp)
+    col2.metric("True Negatives", tn)
+    col3.metric("False Positives", fp)
+    col4.metric("False Negatives", fn)
+
+    logging.info(f"Metrics for class {st.session_state.selected_class} displayed successfully.")    
 
     st.markdown("---")
 
