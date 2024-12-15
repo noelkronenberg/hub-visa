@@ -193,21 +193,30 @@ with st.sidebar.expander("Model", expanded=True):
         
         st.session_state.first_run = False
 
-def display_class_counts(y_test, unique_labels):
+def display_class_counts(y_test, y_pred, unique_labels):
 
     # count instances of each class in the test set
-    class_counts = pd.Series(y_test).value_counts().reindex(range(len(unique_labels)), fill_value=0)
+    actual_class_counts = pd.Series(y_test).value_counts().reindex(range(len(unique_labels)), fill_value=0)
+    predicted_class_counts = pd.Series(y_pred).value_counts().reindex(range(len(unique_labels)), fill_value=0)
 
     # sort by count
-    sorted_counts = class_counts.sort_values(ascending=False)
+    sorted_counts = actual_class_counts.sort_values(ascending=False)
     sorted_labels = [unique_labels[i] for i in sorted_counts.index]
 
     # create a bar chart
     fig = go.Figure(data=[
         go.Bar(
+            name='Actual',
             x=sorted_labels, 
             y=sorted_counts.values, 
-            marker_color=['red' if label == st.session_state.selected_class else 'black' for label in sorted_labels]) # highlight selected class
+            marker_color='black'
+        ),
+        go.Bar(
+            name='Predicted',
+            x=sorted_labels, 
+            y=predicted_class_counts[sorted_counts.index].values, 
+            marker_color='grey'
+        )
     ])
 
     # update layout
@@ -215,7 +224,8 @@ def display_class_counts(y_test, unique_labels):
         xaxis_title="Class",
         yaxis_title="Count",
         margin=dict(l=20, r=20, t=20, b=20),
-        height=300 # reduce height
+        height=300, # reduce height
+        barmode='group' # group bars
     )
 
     # display the figure
@@ -257,7 +267,7 @@ def visualize():
     st.markdown("---")
 
     # display class counts
-    display_class_counts(st.session_state.y_test, st.session_state.unique_labels)
+    display_class_counts(st.session_state.y_test, st.session_state.y_pred, st.session_state.unique_labels)
 
     st.markdown("---")
 
