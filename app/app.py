@@ -209,13 +209,13 @@ def display_class_counts(y_test, y_pred, unique_labels):
             name='Actual',
             x=sorted_labels, 
             y=sorted_counts.values, 
-            marker_color='black'
+            marker_color=['red' if label == st.session_state.selected_class else 'black' for label in sorted_labels]
         ),
         go.Bar(
             name='Predicted',
             x=sorted_labels, 
             y=predicted_class_counts[sorted_counts.index].values, 
-            marker_color='grey'
+            marker_color=['lightcoral' if label == st.session_state.selected_class else 'grey' for label in sorted_labels]
         )
     ])
 
