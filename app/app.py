@@ -338,10 +338,18 @@ if __name__ == "__main__":
     # show results
     if 'first_run' in st.session_state:
 
+        # find the class with the lowest accuracy
+        class_accuracies = {}
+        for i, label in enumerate(st.session_state.unique_labels):
+            class_y_test = (st.session_state.y_test == i).astype(int)
+            class_y_pred = (st.session_state.y_pred == i).astype(int)
+            class_accuracies[label] = accuracy_score(class_y_test, class_y_pred)
+        st.session_state.selected_class = min(class_accuracies, key=class_accuracies.get)
+        st.session_state.selected_class_index = list(st.session_state.unique_labels).index(st.session_state.selected_class)
+
         # allow for customization of viewing settings
         with st.sidebar.expander("**Viewer**", expanded=False):
-            st.session_state.selected_class = st.selectbox("Select Class", st.session_state.unique_labels)
-            st.session_state.selected_class_index = list(st.session_state.unique_labels).index(st.session_state.selected_class)
+            st.session_state.selected_class = st.selectbox("Select Class", st.session_state.unique_labels, index=st.session_state.selected_class_index)
 
         visualize()
         logging.info("Results displayed successfully.")
