@@ -31,12 +31,12 @@ https://github.com/user-attachments/assets/27bd339a-1999-416d-a43f-ba3ad347cadf
 | ID  | Component                | Description                                                                               | Status            | Milestone |
 | --- | ------------------------ | ----------------------------------------------------------------------------------------- | ----------------- | --------- |
 | C1  | Confusion Matrix         | Allow user to view confusion matrix for a trained model in Streamlit application.         | done              | M4        |
-| C2  | Evaluation Metrics       | Allow user to view specific evaluation metrics of model.                                  | done              | M4        |
+| C2  | Evaluation Metrics       | Allow user to view specific model evaluation metrics.                                     | done              | M4        |
 | C3  | Data Upload              | Allow user to upload their own or large dataset.                                          | done              | M4        |
-| C4  | Hosting                  | Allow user to view Streamlit application on hosted website.                               | done              | M4        |
-| C5  | Dynamic Model Training   | Allow user to change model parameters to dynamically retrain model.                       | done              | M4        |
-| C6  | Faster UX                | Enable faster loading times via caching of resources and transparent loading processes. | done              | M4        |
-| C7  | Class Selection          | Allow user to select specific target class to view evaluation metrics regarding it.       | done              | M4        |
+| C4  | Hosting                  | Allow user to view Streamlit application on a hosted website.                             | done              | M4        |
+| C5  | Dynamic Model Training   | Allow user to change model parameters to retrain the model dynamically.                   | done              | M4        |
+| C6  | Faster UX                | Enable faster loading times and improve usability.                                        | done              | M4        |
+| C7  | Class Selection          | Allow users to select a specific target class to view evaluation metrics.                 | done              | M4        |
 | C8  | Improved Metrics Display | Improve readability of key evaluation metrics.                                            | done              | M4        |
 
 
@@ -66,14 +66,14 @@ https://github.com/user-attachments/assets/27bd339a-1999-416d-a43f-ba3ad347cadf
 | C6  | Faster UX                |                                                                              |        |                 |
 | A1  |                          | Adding caching functionality of data (e.g. uploaded data).                   | done   | Noel Kronenberg |
 | A2  |                          | Adding caching functionality of resources (e.g. trained model).              | done   | Noel Kronenberg |
-| A3  |                          | Adding of data loader signs for transparent loading processes.               | done   | Noel Kronenberg |
+| A3  |                          | Adding data loader signs for transparent loading processes.                  | done   | Noel Kronenberg |
 | C7  | Class Selection          |                                                                              |        |                 |
 | A1  |                          | Adding form for selection of class.                                          | done   | Noel Kronenberg |
 | A2  |                          | Highlighting class in confusion matrix.                                      | done   | Noel Kronenberg |
 | A3  |                          | Adding evaluation metrics for selected class.                                | done   | Noel Kronenberg |
 | A4  |                          | Adding highlight to evaluation metrics for selected class.                   | done   | Noel Kronenberg |
 | C8  | Improved Metrics Display |                                                                              |        |                 |
-| A1  |                          | Adding a bar chart for the comparison for predicted and actual class counts. | done   | Aodi Chen       |
+| A1  |                          | Adding a bar chart for the comparison of predicted and actual class counts.  | done   | Aodi Chen       |
 | A2  |                          | Adding confusion matrix metrics.                                             | done   | Aodi Chen       |
 | A3  |                          | Adding collapsible sections.                                                 | done   | Noel Kronenberg |
-| A4  |                          | Preselect class with lowest accuracy.                                        | done   | Noel Kronenberg |
+| A4  |                          | Preselecting class with lowest accuracy.                                     | done   | Noel Kronenberg |
