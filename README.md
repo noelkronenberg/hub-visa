@@ -35,7 +35,7 @@ https://github.com/user-attachments/assets/27bd339a-1999-416d-a43f-ba3ad347cadf
 | C3  | Data Upload              | Allow user to upload their own or large dataset.                                          | done              | M4        |
 | C4  | Hosting                  | Allow user to view Streamlit application on hosted website.                               | done              | M4        |
 | C5  | Dynamic Model Training   | Allow user to change model parameters to dynamically retrain model.                       | done              | M4        |
-| C6  | Faster UX                | Enabling faster loading times via caching of resources and transparent loading processes. | done              | M4        |
+| C6  | Faster UX                | Enable faster loading times via caching of resources and transparent loading processes. | done              | M4        |
 | C7  | Class Selection          | Allow user to select specific target class to view evaluation metrics regarding it.       | done              | M4        |
 | C8  | Improved Metrics Display | Improve readability of key evaluation metrics.                                            | done              | M4        |
 
