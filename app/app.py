@@ -351,8 +351,8 @@ if __name__ == "__main__":
         with st.sidebar.expander("**Viewer**", expanded=False):
             st.session_state.selected_class = st.selectbox("Select Class", st.session_state.unique_labels, index=st.session_state.selected_class_index)
 
+        # update selected class index when the selected class changes
         st.session_state.selected_class_index = list(st.session_state.unique_labels).index(st.session_state.selected_class)
         
         visualize()
         logging.info("Results displayed successfully.")
-        # update selected class index when the selected class changes
