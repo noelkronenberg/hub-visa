@@ -1,6 +1,6 @@
 # VisA
 
-A visual analytics app for exploring machine learning classifications.
+Visual analytics app for exploring machine learning classifications.
 
 ## Showcase
 
