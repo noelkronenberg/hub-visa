@@ -8,14 +8,14 @@ https://github.com/user-attachments/assets/27bd339a-1999-416d-a43f-ba3ad347cadf
 
 > Video updated on December 15th 2024 (commit ```1fe9a5b```). In case the video is not accessible, you may view it via [this](https://drive.google.com/drive/folders/132BcJ8Trho9_eRaCsOj504YdOCG96X35?usp=sharing) link.
 
-## Structure of Repository
+## Structure
 
 - ```.streamlit``` Streamlit configuration (e.g. server settings) 
 - ```app``` Streamlit-based application
 - ```data-exploration``` exploratory data analysis of raw data
 - ```model-training``` training of different models
 
-## Purpose and Scope
+## Milestones
 
 > Solved tasks and addressing of milestones.
 
@@ -41,8 +41,7 @@ https://github.com/user-attachments/assets/27bd339a-1999-416d-a43f-ba3ad347cadf
 | C7  | Class Selection          | Allow users to select a specific target class to view evaluation metrics.                 | done              | M4        |
 | C8  | Improved Metrics Display | Improve readability of key evaluation metrics.                                            | done              | M4        |
 
-
-## Major Implementation Activities
+## Activities
 
 > Major implementation activities for each component.
 
