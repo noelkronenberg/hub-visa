@@ -23,7 +23,7 @@ https://github.com/user-attachments/assets/27bd339a-1999-416d-a43f-ba3ad347cadf
 |--------------|------------------------------------|---------------------------------------------------------------------------------------------------|
 | M1 | Data Exploration | Raw data attributes, overall data distributions, distribution of organic carbon concentration classes, spectral profiles of random soil samples, boxplot of selected wavelengths by carbon concentration class, profiling report. |
 | M2 | Random Forest                      | Train-test split (test size = 0.2), grid search as well as randomized search with 3-fold CV on parameter grid (```n_estimators```, ```max_depth```, ```min_samples_split```, ```min_samples_leaf```, ```max_features```), evaluation of different grid search results (plot of score over iterations, confusion matrix, accuracy score, cross-validation score, mean cross-validation score). |
-| M3 | Explorative Error Analysis Concept (*Konzept I*) | [see [presentation slides](https://docs.google.com/presentation/d/16qUn8gltr5sOPD6g4-4v1JwBQHDfBOIbRnPZEQq2H_U/edit?usp=sharing)] |
+| M3 | Explorative Error Analysis Concept (*Konzept I*) | [[presentation slides](https://docs.google.com/presentation/d/16qUn8gltr5sOPD6g4-4v1JwBQHDfBOIbRnPZEQq2H_U/edit?usp=sharing)] [[updated wireframe](https://docs.google.com/presentation/d/1CWkKQfMkITK6Dze0oZnR4_OqrqThp5agR9G6SoI4Jhk/edit?usp=sharing)] |
 | M4 | Explorative Error Analysis Prototype (*Komponente I*) | [see *Components*] |
 
 ## Components
