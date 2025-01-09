@@ -54,38 +54,38 @@ https://github.com/user-attachments/assets/27bd339a-1999-416d-a43f-ba3ad347cadf
 
 | ID  | Component                | Description                                                                  | Status | Point Person    |
 | --- | ------------------------ | ---------------------------------------------------------------------------- | ------ | --------------- |
-| C1  | Confusion Matrix         |                                                                              |        |                 |
+| C1  | Confusion Matrix         |                                                                              |        | Noel Kronenberg |
 | A1  |                          | Setting up Streamlit application.                                            | done   | Noel Kronenberg |
 | A2  |                          | Integrating trained model with application.                                  | done   | Noel Kronenberg |
 | A3  |                          | Integrating trained model with Plotly figure.                                | done   | Noel Kronenberg |
 | A4  |                          | Integrating Plotly figure with application.                                  | done   | Noel Kronenberg |
-| C2  | Evaluation Metrics       |                                                                              |        |                 |
+| C2  | Evaluation Metrics       |                                                                              |        | Noel Kronenberg |
 | A1  |                          | Calculation of evaluation metrics for trained model.                         | done   | Noel Kronenberg |
 | A2  |                          | Displaying of evaluation metrics on Streamlit application.                   | done   | Noel Kronenberg |
 | A3  |                          | Adding a bar chart for the comparison of predicted and actual class counts.  | done   | Aodi Chen       |
 | A4  |                          | Adding confusion matrix metrics.                                             | done   | Aodi Chen       |
 | A5  |                          | Adding collapsible sections to hide metrics.                                 | done   | Noel Kronenberg |
 | A6  |                          | Preselecting class with lowest accuracy.                                     | done   | Noel Kronenberg |
-| C3  | Data Upload              |                                                                              |        |                 |
+| C3  | Data Upload              |                                                                              |        | Noel Kronenberg |
 | A1  |                          | Adding form for uploading data.                                              | done   | Noel Kronenberg |
 | A2  |                          | Increasing maximum Streamlit upload limit.                                   | done   | Noel Kronenberg |
-| C4  | Hosting                  |                                                                              |        |                 |
+| C4  | Hosting                  |                                                                              |        | Noel Kronenberg |
 | A1  |                          | Setting up Streamlit Community Cloud.                                        | done   | Noel Kronenberg |
 | A2  |                          | Making application compatible with hosting.                                  | done   | Noel Kronenberg |
-| C5  | Dynamic Model Training   |                                                                              |        |                 |
+| C5  | Dynamic Model Training   |                                                                              |        | Noel Kronenberg |
 | A1  |                          | Adding form for adjustment of parameters.                                    | done   | Noel Kronenberg |
 | A2  |                          | Adding function to dynamically train model with new parameters.              | done   | Noel Kronenberg |
-| C6  | Faster UX                |                                                                              |        |                 |
+| C6  | Faster UX                |                                                                              |        | Noel Kronenberg |
 | A1  |                          | Adding caching functionality of data (e.g. uploaded data).                   | done   | Noel Kronenberg |
 | A2  |                          | Adding caching functionality of resources (e.g. trained model).              | done   | Noel Kronenberg |
 | A3  |                          | Adding data loader signs for transparent loading processes.                  | done   | Noel Kronenberg |
-| C7  | Class Selection          |                                                                              |        |                 |
+| C7  | Class Selection          |                                                                              |        | Noel Kronenberg |
 | A1  |                          | Adding form for selection of class.                                          | done   | Noel Kronenberg |
 | A2  |                          | Highlighting class in confusion matrix.                                      | done   | Noel Kronenberg |
 | A3  |                          | Adding evaluation metrics for selected class.                                | done   | Noel Kronenberg |
 | A4  |                          | Adding highlight to evaluation metrics for selected class.                   | done   | Noel Kronenberg |
-| C8  | Overview of Importance Scores | | | |
+| C8  | Overview of Importance Scores | | | Aodi Chen |
 | C9  | Impact of Intervals | | | |
-| C10  | Impact of 2-D Intervals | | | |
+| C10  | Impact of 2-D Intervals | | | Aodi Chen |
 | C11  | Interval Settings | | | |
 | C12  | Improved Division of Tasks | | | |
