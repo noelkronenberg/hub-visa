@@ -41,6 +41,12 @@ https://github.com/user-attachments/assets/27bd339a-1999-416d-a43f-ba3ad347cadf
 | C6  | Faster UX                | Enable faster loading times and improve usability.                                        | done              | M4        |
 | C7  | Class Selection          | Allow users to select a specific target class to view evaluation metrics.                 | done              | M4        |
 | C8  | Improved Metrics Display | Improve readability of key evaluation metrics.                                            | done              | M4        |
+| C9  | Overview of Importance Scores | Show importance scores for each feature as bar chart.                                            | open              | M5        |
+| C10  | Impact of Intervals | Show the average impact of intervals as beeswarm.                                            | open              | M5        |
+| C11  | Impact of 2-D Intervals | Show the average impact of 2-D intervals as heatmap.                                            | open              | M5        |
+| C12  | Interval Settings | Allow the user to change settings for intervals (e.g. number of intervals).                                            | open              | M5        |
+| C13  | Improved Division of Tasks | Allow the user to focus on a single task (e.g. model training, error exploration, investigation of importance).                                            | open              | M5        |
+
 
 ## Activities
 
