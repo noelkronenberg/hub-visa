@@ -40,12 +40,11 @@ https://github.com/user-attachments/assets/27bd339a-1999-416d-a43f-ba3ad347cadf
 | C5  | Dynamic Model Training   | Allow user to change model parameters to retrain the model dynamically.                   | done              | M4        |
 | C6  | Faster UX                | Enable faster loading times and improve usability.                                        | done              | M4        |
 | C7  | Class Selection          | Allow users to select a specific target class to view evaluation metrics.                 | done              | M4        |
-| C8  | Improved Metrics Display | Improve readability of key evaluation metrics.                                            | done              | M4        |
-| C9  | Overview of Importance Scores | Show importance scores for each feature as bar chart.                                            | open              | M5        |
-| C10  | Impact of Intervals | Show the average impact of intervals as beeswarm.                                            | open              | M5        |
-| C11  | Impact of 2-D Intervals | Show the average impact of 2-D intervals as heatmap.                                            | open              | M5        |
-| C12  | Interval Settings | Allow the user to change settings for intervals (e.g. number of intervals).                                            | open              | M5        |
-| C13  | Improved Division of Tasks | Allow the user to focus on a single task (e.g. model training, error exploration, investigation of importance).                                            | open              | M5        |
+| C8  | Overview of Importance Scores | Show importance scores for each feature as bar chart.                                            | open              | M5        |
+| C9  | Impact of Intervals | Show the average impact of intervals as beeswarm.                                            | open              | M5        |
+| C10  | Impact of 2-D Intervals | Show the average impact of 2-D intervals as heatmap.                                            | open              | M5        |
+| C11  | Interval Settings | Allow the user to change settings for intervals (e.g. number of intervals).                                            | open              | M5        |
+| C12  | Improved Division of Tasks | Allow the user to focus on a single task (e.g. model training, error exploration, investigation of importance).                                            | open              | M5        |
 
 
 ## Activities
@@ -62,6 +61,10 @@ https://github.com/user-attachments/assets/27bd339a-1999-416d-a43f-ba3ad347cadf
 | C2  | Evaluation Metrics       |                                                                              |        |                 |
 | A1  |                          | Calculation of evaluation metrics for trained model.                         | done   | Noel Kronenberg |
 | A2  |                          | Displaying of evaluation metrics on Streamlit application.                   | done   | Noel Kronenberg |
+| A3  |                          | Adding a bar chart for the comparison of predicted and actual class counts.  | done   | Aodi Chen       |
+| A4  |                          | Adding confusion matrix metrics.                                             | done   | Aodi Chen       |
+| A5  |                          | Adding collapsible sections to hide metrics.                                 | done   | Noel Kronenberg |
+| A6  |                          | Preselecting class with lowest accuracy.                                     | done   | Noel Kronenberg |
 | C3  | Data Upload              |                                                                              |        |                 |
 | A1  |                          | Adding form for uploading data.                                              | done   | Noel Kronenberg |
 | A2  |                          | Increasing maximum Streamlit upload limit.                                   | done   | Noel Kronenberg |
@@ -80,8 +83,3 @@ https://github.com/user-attachments/assets/27bd339a-1999-416d-a43f-ba3ad347cadf
 | A2  |                          | Highlighting class in confusion matrix.                                      | done   | Noel Kronenberg |
 | A3  |                          | Adding evaluation metrics for selected class.                                | done   | Noel Kronenberg |
 | A4  |                          | Adding highlight to evaluation metrics for selected class.                   | done   | Noel Kronenberg |
-| C8  | Improved Metrics Display |                                                                              |        |                 |
-| A1  |                          | Adding a bar chart for the comparison of predicted and actual class counts.  | done   | Aodi Chen       |
-| A2  |                          | Adding confusion matrix metrics.                                             | done   | Aodi Chen       |
-| A3  |                          | Adding collapsible sections.                                                 | done   | Noel Kronenberg |
-| A4  |                          | Preselecting class with lowest accuracy.                                     | done   | Noel Kronenberg |
