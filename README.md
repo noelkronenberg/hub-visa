@@ -85,7 +85,7 @@ https://github.com/user-attachments/assets/27bd339a-1999-416d-a43f-ba3ad347cadf
 | A3  |                          | Adding evaluation metrics for selected class.                                | done   | Noel Kronenberg |
 | A4  |                          | Adding highlight to evaluation metrics for selected class.                   | done   | Noel Kronenberg |
 | C8  | Overview of Importance Scores | | | Aodi Chen |
-| C9  | Impact of Intervals | | | |
+| C9  | Impact of Intervals | | | Fabian Henning |
 | C10  | Impact of 2-D Intervals | | | Aodi Chen |
 | C11  | Interval Settings | | | |
 | C12  | Improved Division of Tasks | | | |
