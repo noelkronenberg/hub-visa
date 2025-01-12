@@ -88,4 +88,4 @@ https://github.com/user-attachments/assets/27bd339a-1999-416d-a43f-ba3ad347cadf
 | C9  | Impact of Intervals | | | Fabian Henning |
 | C10  | Impact of 2-D Intervals | | | Aodi Chen |
 | C11  | Interval Settings | | | |
-| C12  | Improved Division of Tasks | | | |
+| C12  | Improved Division of Tasks | | | Noel Kronenberg|
