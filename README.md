@@ -89,3 +89,5 @@ https://github.com/user-attachments/assets/27bd339a-1999-416d-a43f-ba3ad347cadf
 | C10  | Impact of 2-D Intervals | | | Aodi Chen |
 | C11  | Interval Settings | | | |
 | C12  | Improved Division of Tasks | | | Noel Kronenberg|
+| A1  | | Adding of tabs for Explorative Error Analysis and Feature Importance. | done | Noel Kronenberg |
+| A2  | | Refactoring the code to be more readable. | in progress | Noel Kronenberg |
