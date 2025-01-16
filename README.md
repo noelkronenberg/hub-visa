@@ -4,9 +4,7 @@ Visual analytics app for exploring machine learning classifications.
 
 ## Showcase
 
-https://github.com/user-attachments/assets/27bd339a-1999-416d-a43f-ba3ad347cadf
-
-> Video updated on December 15th 2024 (commit ```1fe9a5b```). In case the video is not accessible, you may view it via [this](https://drive.google.com/drive/folders/132BcJ8Trho9_eRaCsOj504YdOCG96X35?usp=sharing) link.
+The app is live and hosted on the Streamlit Community Cloud: [visual-a.streamlit.app](https://visual-a.streamlit.app/)
 
 ## Structure
 
