@@ -247,7 +247,6 @@ with tab1:
 
     # show results
     def visualize():
-        
         # display overall metrics
         with st.expander("**Overall Metrics**", expanded=True):
             col1, col2, col3, col4 = st.columns(4)
@@ -399,5 +398,6 @@ with tab2:
         )
 
         # display the figure
-        st.plotly_chart(fig)
-        logging.info("Feature importance displayed successfully.")
+        with st.expander("**Overall Feature Importance**", expanded=True):
+            st.plotly_chart(fig)
+            logging.info("Feature importance displayed successfully.")
