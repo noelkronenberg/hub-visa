@@ -6,9 +6,12 @@ from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, r
 from sklearn.model_selection import train_test_split
 import plotly.graph_objects as go
 import logging
+import os
 
 from error_analysis import visualize_error_analysis
 from feature_importance import visualize_feature_importance
+from feature_importance import visualize_feature_interactions
+
 from data import preset_target, preset_training, load_data, prepare_data
 from model import train_model, evaluate_model
 
@@ -203,7 +206,7 @@ if 'first_run' in st.session_state:
     # update selected class index when the selected class changes
     st.session_state.selected_class_index = list(st.session_state.unique_labels).index(st.session_state.selected_class)
 
-tab1, tab2 = st.tabs(["Explorative Error Analysis", "Feature Importance"])
+tab1, tab2 = st.tabs(["Explorative Error Analysis", "Feature Importance & Interactions"])
 
 # -----------------------------------------------------------
 # Explorative Error Analysis
@@ -248,14 +251,27 @@ with tab1:
         logging.info("Results displayed successfully.")
 
 # -----------------------------------------------------------
-# Feature Importance
+# Feature Importance & Interactions
 # -----------------------------------------------------------
 
 with tab2:
     if 'first_run' not in st.session_state:
-        st.warning("Please train the model first to view feature importance.")
+        st.warning("Please train the model first to view feature analysis.")
     else:
-        visualize_feature_importance(
-            st.session_state.rf_classifier, 
-            st.session_state.get('training_data', pd.read_csv(preset_training))
-        )
+        subtab1, subtab2 = st.tabs(["Feature Importance Analysis", "Feature Interaction Analysis"])
+        
+        with subtab1:
+            visualize_feature_importance(
+                st.session_state.rf_classifier,  # model
+                st.session_state.X_test,        
+                st.session_state.X_test.columns # feature names
+            )
+            logging.info("Feature importance displayed successfully.")
+            
+        with subtab2:
+            visualize_feature_interactions(
+                st.session_state.rf_classifier,
+                st.session_state.X_test,
+                st.session_state.X_test.columns # feature names
+            )
+            logging.info("Feature interactions displayed successfully.")
