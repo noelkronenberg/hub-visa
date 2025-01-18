@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import plotly.express as px
 from sklearn.metrics import accuracy_score
 import logging
 
@@ -8,6 +9,7 @@ from feature_importance import visualize_feature_importance
 
 from data import preset_target, preset_training, load_data, prepare_data
 from model import train_model, evaluate_model
+import random
 
 # configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -202,11 +204,82 @@ if 'first_run' in st.session_state:
     # update selected class index when the selected class changes
     st.session_state.selected_class_index = list(st.session_state.unique_labels).index(st.session_state.selected_class)
 
-tab1, tab2 = st.tabs(["Explorative Error Analysis", "Feature Importance & Interactions"])
+tab1, tab2, tab3 = st.tabs([ "Data Exploration", "Explorative Error Analysis", "Feature Importance & Interactions"])
 
 # -----------------------------------------------------------
-# Explorative Error Analysis
+# Data Exploration
 # -----------------------------------------------------------
+
+def plot_target_distribution(df_combined):
+    """
+    Plot target distribution.
+    """
+
+    # create histogram
+    fig = px.histogram(df_combined, x='x', color='x', title='', 
+                       labels={'x': 'Carbon Concentration Class'}, 
+                       template='plotly_dark',
+                       category_orders={'x': df_combined['x'].value_counts().index})
+    fig.update_layout(margin=dict(l=20, r=20, t=20, b=20))
+
+    # update hover template
+    fig.update_traces(hovertemplate='Class: %{x}<br>Count: %{y}<extra></extra>')
+
+    # display the figure
+    with st.expander("**Target Distribution**", expanded=True):
+        st.plotly_chart(fig)
+        logging.info("Target distribution displayed successfully.")
+
+def plot_spectral_profiles(df_combined):
+    """
+    Plot spectral profiles.
+    """
+
+    with st.expander("**Spectral Profiles**", expanded=True):
+        # sample spectral profiles
+        num_samples = st.slider('Number of Samples', min_value=1, max_value=10, value=3, key='num_samples_spectral')
+
+        # select a few spectral profiles to display
+        sample_spectral_profiles = df_combined.sample(num_samples).drop(columns=['x'])
+
+        # plot spectral profiles
+        fig_spectral = px.line(title='')
+        for idx, row in sample_spectral_profiles.iterrows():
+            fig_spectral.add_scatter(x=row.index.astype(float), y=row.values, mode='lines', name=f'Sample {idx}', hovertemplate='Wavelength: %{x}<br>Spectral Value: %{y}<extra></extra>')
+        fig_spectral.update_layout(xaxis_title='Wavelength', yaxis_title='Spectral Value', template='plotly_dark', margin=dict(l=20, r=20, t=20, b=20))
+        st.plotly_chart(fig_spectral)
+
+        logging.info("Spectral profiles displayed successfully.")
+
+def plot_wavelength_distribution(df_combined):
+    """
+    Plot wavelength distribution.
+    """
+
+    # select a few wavelengths to display (first, 1/4, 1/2, 3/4, last)
+    wavelength_columns = df_combined.columns[:-1]
+    selected_wavelengths = [
+        wavelength_columns[0],
+        wavelength_columns[len(wavelength_columns) // 4],
+        wavelength_columns[len(wavelength_columns) // 2],
+        wavelength_columns[3 * len(wavelength_columns) // 4],
+        wavelength_columns[-1]
+    ]
+
+    # melt the DataFrame for plotting (wide to long format)
+    df_melted = df_combined.melt(id_vars='x', value_vars=selected_wavelengths, var_name='Wavelength', value_name='Value')
+
+    # create box plot
+    fig_boxplot = px.box(df_melted, x='Wavelength', y='Value', color='x', title='', template='plotly_dark')
+    fig_boxplot.update_layout(margin=dict(l=20, r=20, t=20, b=20))
+
+    # update hover template
+    fig_boxplot.update_traces(hovertemplate='Wavelength: %{x}<br>Value: %{y}<extra></extra>')
+
+    # display the figure
+    with st.expander("**Wavelength Distribution**", expanded=True):
+        st.plotly_chart(fig_boxplot)
+        logging.info("Wavelength distribution displayed successfully.")
 
 with tab1:
 
@@ -223,6 +296,24 @@ with tab1:
                 st.write(df_target)
             
             logging.info("Raw data displayed successfully.")
+
+    if 'first_run' not in st.session_state:
+        st.warning("Please train the model first to view data exploration.")
+
+    else:
+        df_combined = pd.concat([st.session_state['training_data'], st.session_state['target_data']], axis=1)
+
+        plot_target_distribution(df_combined)
+        plot_spectral_profiles(df_combined)
+        plot_wavelength_distribution(df_combined)
+        
+        logging.info("Data exploration displayed successfully.")
+
+# -----------------------------------------------------------
+# Explorative Error Analysis
+# -----------------------------------------------------------
+
+with tab2:
 
     # show placeholder
     if 'first_run' not in st.session_state:
@@ -250,7 +341,7 @@ with tab1:
 # Feature Importance & Interactions
 # -----------------------------------------------------------
 
-with tab2:
+with tab3:
     if 'first_run' not in st.session_state:
         st.warning("Please train the model first to view feature analysis.")
     else:
