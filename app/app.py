@@ -203,7 +203,7 @@ if 'first_run' in st.session_state:
     # update selected class index when the selected class changes
     st.session_state.selected_class_index = list(st.session_state.unique_labels).index(st.session_state.selected_class)
 
-tab1, tab2, tab3 = st.tabs([ "Data Exploration", "Explorative Error Analysis", "Feature Importance & Interactions"])
+tab1, tab2, tab3 = st.tabs([ "Data Exploration", "Explorative Error Analysis", "Feature Importance"])
 
 # -----------------------------------------------------------
 # Data Exploration
