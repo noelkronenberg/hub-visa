@@ -4,7 +4,7 @@ Visual analytics app for exploring machine learning classifications.
 
 ## Showcase
 
-The app is live and hosted on the Streamlit Community Cloud: [visual-a.streamlit.app](https://visual-a.streamlit.app/)
+The app is live and hosted on the Streamlit Community Cloud: [visa-demo.streamlit.app](https://visa-demo.streamlit.app/)
 
 ## Structure
 
