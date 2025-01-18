@@ -5,6 +5,8 @@ import plotly.graph_objects as go
 import shap
 import numpy as np
 
+from config import RED
+
 def _get_feature_importance(model):
     """
     Calculate feature importance using built-in feature importance of sklearn models.
@@ -53,7 +55,7 @@ def visualize_feature_importance(model):
         fig = go.Figure(data=go.Bar(
             x=sorted_feature_importance['rank'],
             y=sorted_feature_importance['importance'],
-            marker_color='blue',
+            marker_color=RED,
             textposition='auto',
             hovertemplate='Rank: %{x}<br>Feature: %{customdata}<br>Importance: %{y:.4f}<extra></extra>',
             customdata=sorted_feature_importance['feature']
