@@ -4,9 +4,7 @@ Visual analytics app for exploring machine learning classifications.
 
 ## Showcase
 
-https://github.com/user-attachments/assets/27bd339a-1999-416d-a43f-ba3ad347cadf
-
-> Video updated on December 15th 2024 (commit ```1fe9a5b```). In case the video is not accessible, you may view it via [this](https://drive.google.com/drive/folders/132BcJ8Trho9_eRaCsOj504YdOCG96X35?usp=sharing) link.
+The app is live and hosted on the Streamlit Community Cloud: [visual-a.streamlit.app](https://visual-a.streamlit.app/)
 
 ## Structure
 
@@ -89,3 +87,5 @@ https://github.com/user-attachments/assets/27bd339a-1999-416d-a43f-ba3ad347cadf
 | C10  | Impact of 2-D Intervals | | | Aodi Chen |
 | C11  | Interval Settings | | | |
 | C12  | Improved Division of Tasks | | | Noel Kronenberg|
+| A1  | | Adding of tabs for Explorative Error Analysis and Feature Importance. | done | Noel Kronenberg |
+| A2  | | Refactoring the code to be more readable. | done | Noel Kronenberg |
