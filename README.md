@@ -83,12 +83,15 @@ The app is live and hosted on the Streamlit Community Cloud: [visual-a.streamlit
 | A3  |                          | Adding evaluation metrics for selected class.                                | done   | Noel Kronenberg |
 | A4  |                          | Adding highlight to evaluation metrics for selected class.                   | done   | Noel Kronenberg |
 | C8  | Overview of Importance Scores | | | Aodi Chen |
+| A1  | | Calculating importance scores. | done | Aodi Chen, Noel Kronenberg |
+| A2  | | Adding bar chart to plot feature importance. | done | Aodi Chen, Noel Kronenberg |
+| A3  | | Adding slider to select number of features. | done | Noel Kronenberg |
 | C9  | Impact of Intervals | | | Fabian Henning |
 | C10  | Impact of 2-D Intervals | | | Aodi Chen |
 | C11  | Interval Settings | | | |
 | C12  | Improved Division of Tasks | | | Noel Kronenberg|
 | A1  | | Adding of tabs for Explorative Error Analysis and Feature Importance. | done | Noel Kronenberg |
-| A2  | | Refactoring the code to be more readable. | done | Noel Kronenberg |
+| A2  | | Refactoring (e.g. encapsulating) the code to be more readable. | done | Noel Kronenberg |
 
 ## Improvements
 
