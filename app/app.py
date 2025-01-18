@@ -28,15 +28,17 @@ with st.sidebar.expander("**Data**", expanded=False):
     target_file = st.file_uploader("Upload Target CSV", type=["csv"])
     training_file = st.file_uploader("Upload Training CSV", type=["csv"])
 
+    # load data
     if target_file is not None:
         df_target = pd.read_csv(target_file)
         st.session_state['target_data'] = df_target
         logging.info("Added target file to session state.")
 
-        if training_file is not None:
-            df_training = pd.read_csv(training_file)
-            st.session_state['training_data'] = df_training
-            logging.info("Added training file to session state.")
+    # load data
+    if training_file is not None:
+        df_training = pd.read_csv(training_file)
+        st.session_state['training_data'] = df_training
+        logging.info("Added training file to session state.")
 
     show_data = st.checkbox('Show raw data')
 
