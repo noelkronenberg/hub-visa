@@ -35,13 +35,15 @@ def _display_class_counts(y_test, y_pred, unique_labels, selected_class):
             name='Actual',
             x=sorted_labels, 
             y=sorted_counts.values, 
-            marker_color=['red' if label == selected_class else 'black' for label in sorted_labels]
+            marker_color=['red' if label == selected_class else 'black' for label in sorted_labels],
+            hovertemplate='Class: %{x}<br>Count: %{y}<extra></extra>'
         ),
         go.Bar(
             name='Predicted',
             x=sorted_labels, 
             y=predicted_class_counts[sorted_counts.index].values, 
-            marker_color=['lightcoral' if label == selected_class else 'grey' for label in sorted_labels]
+            marker_color=['lightcoral' if label == selected_class else 'grey' for label in sorted_labels],
+            hovertemplate='Class: %{x}<br>Count: %{y}<extra></extra>'
         )
     ])
 
@@ -105,10 +107,11 @@ def _display_confusion_matrix(cm, unique_labels, selected_class_index):
 
     fig = go.Figure(data=go.Heatmap(
         z=cm,
-        x=[f'Predicted: {label}' for label in unique_labels],
-        y=[f'Actual: {label}' for label in unique_labels],
+        x=[f'{label}' for label in unique_labels],
+        y=[f'{label}' for label in unique_labels],
         colorscale='Blues',
-        showscale=True
+        showscale=True,
+        hovertemplate='Predicted: %{x}<br>Actual: %{y}<br>Count: %{z}<extra></extra>'
     ))
 
     # confusion matrix: improve layout 
