@@ -9,7 +9,6 @@ from feature_importance import visualize_feature_importance
 
 from data import preset_target, preset_training, load_data, prepare_data
 from model import train_model, evaluate_model
-import random
 
 # configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
