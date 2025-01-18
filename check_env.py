@@ -69,7 +69,8 @@ requirements = {
     "scikit-learn": "1.4.2",
     "plotly": "5.24.1",
     "shap": "0.46.0",
-    "matplotlib": "3.7.5"
+    "matplotlib": "3.7.5",
+    "numpy": "1.23.5"
 }
 
 # now the dependencies
