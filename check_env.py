@@ -68,7 +68,8 @@ requirements = {
     "pandas": "2.1.4",
     "scikit-learn": "1.4.2",
     "plotly": "5.24.1",
-    "shap": "0.46.0"
+    "shap": "0.46.0",
+    "matplotlib": "3.7.5"
 }
 
 # now the dependencies
