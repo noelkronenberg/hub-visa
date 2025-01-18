@@ -6,43 +6,18 @@ import shap
 import matplotlib.pyplot as plt
 import numpy as np
 
-from data import preset_training
-
-def _get_feature_importance(model, X_test, feature_names):
+def _get_feature_importance(model):
     """
-    Calculate feature importance using SHAP values.
+    Calculate feature importance using built-in feature importance of sklearn models.
     """
 
-    explainer = shap.TreeExplainer(model)
+    # check if the model has feature_importances_ attribute
+    importance_values = model.feature_importances_
+    logging.info(f"Feature importance values extracted successfully.")
 
-    sample_size = min(100, len(X_test))
-    X_sample = X_test.sample(n=sample_size, random_state=42)
-    
-    # get SHAP values
-    shap_values = explainer.shap_values(X_sample)
-    if isinstance(shap_values, list):
-        importance_values = []
-        for sv in shap_values:
-            if len(sv.shape) > 2:
-                sv = sv.reshape(sv.shape[0], -1)
-            importance_values.append(sv.mean(axis=0))
-        importance_values = np.mean(importance_values, axis=0)
-    else:
-        if len(shap_values.shape) > 2:
-            shap_values = shap_values.reshape(shap_values.shape[0], -1)
-        importance_values = shap_values.mean(axis=0)
-    
-    # ensure importance_values length matches feature_names length
-    if len(importance_values) != len(feature_names):
-        logging.error(f"Mismatch: importance_values length ({len(importance_values)}) != feature_names length ({len(feature_names)})")
-        if len(importance_values) > len(feature_names):
-            importance_values = importance_values[:len(feature_names)]
-            logging.warning(f"Importance values truncated to match feature names length.")
-        else:
-            importance_values = np.pad(importance_values, 
-                                        (0, len(feature_names) - len(importance_values)), 
-                                        'constant')
-            logging.warning(f"Importance values padded to match feature names length.")
+    # if feature_names is not provided, get it from the model
+    feature_names = model.feature_names_in_
+    logging.info(f"Feature names extracted from the model.")
 
     # create DataFrame with feature importance
     feature_importance = pd.DataFrame({
@@ -51,57 +26,50 @@ def _get_feature_importance(model, X_test, feature_names):
     })
     logging.info(f"Feature importance DataFrame created successfully.")
 
-    return feature_importance, explainer, X_sample
+    return feature_importance
 
-def visualize_feature_importance(model, X_test, feature_names, n_features=25):
+def visualize_feature_importance(model):
     """
-    Visualize feature importance using SHAP values.
+    Visualize feature importance using built-in feature importance of sklearn models.
     """
 
     # get feature importance data
-    feature_importance, explainer, X_sample = _get_feature_importance(model, X_test, feature_names)
+    feature_importance = _get_feature_importance(model)
 
     # sort feature importance by absolute value in descending order
-    sorted_feature_importance = feature_importance.copy()
-    sorted_feature_importance = sorted_feature_importance[sorted_feature_importance['importance'].abs() > 0.0001]
-    sorted_feature_importance = sorted_feature_importance.reindex(
-        sorted_feature_importance['importance'].abs().sort_values(ascending=False).index
-    )
-    sorted_feature_importance['importance'] = sorted_feature_importance['importance'].round(4)
-    logging.info(f"Feature importance DataFrame sorted.")
-    
-    # create DataFrame with specific columns and reset index
-    ranked_feature_importance = pd.DataFrame({
-        'rank': range(1, len(sorted_feature_importance) + 1),
-        'feature': sorted_feature_importance['feature'],
-        'importance': sorted_feature_importance['importance']
-    }).reset_index(drop=True).head(n_features)
-    logging.info(f"Ranked feature importance DataFrame created.")
+    sorted_feature_importance = feature_importance.reindex(feature_importance['importance'].abs().sort_values(ascending=False).index)
 
-    # create bar chart
-    fig = go.Figure(data=go.Bar(
-        x=ranked_feature_importance['importance'],
-        y=ranked_feature_importance['rank'],
-        orientation='h',
-        marker_color=['red' if x < 0 else 'blue' for x in ranked_feature_importance['importance']],
-        text=ranked_feature_importance['importance'].round(4),
-        textposition='auto',
-        hovertemplate='Feature: %{y}<br>Importance (SHAP Value): %{x:.4f}<extra></extra>'
-    ))
-
-    # update layout
-    fig.update_layout(
-        title='',
-        xaxis_title='Importance (SHAP Value)',
-        yaxis_title="Rank",
-        yaxis=dict(autorange='reversed'), # ensure ranking is from top to bottom
-        margin=dict(l=20, r=20, t=20, b=20),
-        height=600,
-        showlegend=False
-    )
+    # assign rank based on importance
+    sorted_feature_importance['rank'] = range(1, len(sorted_feature_importance) + 1)
 
     # display feature importance
     with st.expander("**Feature Importance**", expanded=True):
+
+        # allow user to select range of values to show
+        num_features = st.slider('Number of Features', min_value=1, max_value=len(sorted_feature_importance), value=20)
+        sorted_feature_importance = sorted_feature_importance.head(num_features)
+        logging.info(f"Top {num_features} feature importance displayed successfully.")
+
+        # create bar chart
+        fig = go.Figure(data=go.Bar(
+            x=sorted_feature_importance['rank'],
+            y=sorted_feature_importance['importance'],
+            marker_color='blue',
+            textposition='auto',
+            hovertemplate='Rank: %{x}<br>Feature: %{customdata}<br>Importance: %{y:.4f}<extra></extra>',
+            customdata=sorted_feature_importance['feature']
+        ))
+
+        # update layout
+        fig.update_layout(
+            title='',
+            xaxis_title='Rank',
+            yaxis_title='Importance',
+            margin=dict(l=20, r=20, t=20, b=20),
+            height=600,
+            showlegend=False
+        )
+
         st.plotly_chart(fig, use_container_width=True)
         logging.info("Feature importance displayed successfully.")
 
@@ -177,5 +145,5 @@ def visualize_feature_interactions(model, X_test, feature_names):
 
         # display feature interaction
         with st.expander("**Feature Interaction**", expanded=True):
-            st.plotly_chart(fig)
+            st.plotly_chart(fig, use_container_width=True)
             logging.info("Feature interaction displayed successfully.")

@@ -259,9 +259,7 @@ with tab2:
         st.warning("Please train the model first to view feature analysis.")
     else:
         visualize_feature_importance(
-            st.session_state.rf_classifier,
-            st.session_state.X_test,        
-            st.session_state.X_test.columns
+            st.session_state.rf_classifier
         )
         logging.info("Feature importance displayed successfully.")
             
