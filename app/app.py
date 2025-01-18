@@ -4,7 +4,7 @@ from sklearn.metrics import accuracy_score
 import logging
 
 from error_analysis import visualize_error_analysis
-from feature_importance import visualize_feature_importance, visualize_feature_interactions
+from feature_importance import visualize_feature_importance
 
 from data import preset_target, preset_training, load_data, prepare_data
 from model import train_model, evaluate_model
@@ -256,10 +256,3 @@ with tab2:
             st.session_state.rf_classifier
         )
         logging.info("Feature importance displayed successfully.")
-            
-        visualize_feature_interactions(
-            st.session_state.rf_classifier,
-            st.session_state.X_test,
-            st.session_state.X_test.columns
-        )
-        logging.info("Feature interactions displayed successfully.")
