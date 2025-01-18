@@ -258,20 +258,16 @@ with tab2:
     if 'first_run' not in st.session_state:
         st.warning("Please train the model first to view feature analysis.")
     else:
-        subtab1, subtab2 = st.tabs(["Feature Importance Analysis", "Feature Interaction Analysis"])
-        
-        with subtab1:
-            visualize_feature_importance(
-                st.session_state.rf_classifier,  # model
-                st.session_state.X_test,        
-                st.session_state.X_test.columns # feature names
-            )
-            logging.info("Feature importance displayed successfully.")
+        visualize_feature_importance(
+            st.session_state.rf_classifier,
+            st.session_state.X_test,        
+            st.session_state.X_test.columns
+        )
+        logging.info("Feature importance displayed successfully.")
             
-        with subtab2:
-            visualize_feature_interactions(
-                st.session_state.rf_classifier,
-                st.session_state.X_test,
-                st.session_state.X_test.columns # feature names
-            )
-            logging.info("Feature interactions displayed successfully.")
+        visualize_feature_interactions(
+            st.session_state.rf_classifier,
+            st.session_state.X_test,
+            st.session_state.X_test.columns
+        )
+        logging.info("Feature interactions displayed successfully.")
