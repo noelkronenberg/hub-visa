@@ -4,6 +4,8 @@ import streamlit as st
 from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score, f1_score
 import plotly.graph_objects as go
 
+from config import SELECTION_COLOR
+
 def _display_overall_metrics(accuracy, precision, recall, f1):
     """
     Display the overall metrics.
@@ -35,14 +37,18 @@ def _display_class_counts(y_test, y_pred, unique_labels, selected_class):
             name='Actual',
             x=sorted_labels, 
             y=sorted_counts.values, 
-            marker_color=['red' if label == selected_class else 'black' for label in sorted_labels],
+            marker_color='black',
+            marker_line_width=1,
+            marker_line_color=[SELECTION_COLOR if label == selected_class else 'black' for label in sorted_labels],
             hovertemplate='Class: %{x}<br>Count: %{y}<extra></extra>'
         ),
         go.Bar(
             name='Predicted',
             x=sorted_labels, 
             y=predicted_class_counts[sorted_counts.index].values, 
-            marker_color=['lightcoral' if label == selected_class else 'grey' for label in sorted_labels],
+            marker_color='grey',
+            marker_line_color=[SELECTION_COLOR if label == selected_class else 'grey' for label in sorted_labels],
+            marker_line_width=1,
             hovertemplate='Class: %{x}<br>Count: %{y}<extra></extra>'
         )
     ])
@@ -53,7 +59,12 @@ def _display_class_counts(y_test, y_pred, unique_labels, selected_class):
         yaxis_title="Count",
         margin=dict(l=20, r=20, t=20, b=20),
         height=300, # reduce height
-        barmode='group' # group bars
+        barmode='group', # group bars
+        xaxis=dict(
+            tickmode='array',
+            tickvals=list(range(len(sorted_labels))),
+            ticktext=[f'<span style="color:{SELECTION_COLOR};">{label}</span>' if label == selected_class else label for label in sorted_labels]
+        )
     )
 
     # display the figure
@@ -118,8 +129,16 @@ def _display_confusion_matrix(cm, unique_labels, selected_class_index):
     fig.update_layout(
         xaxis_title='Predicted Label',
         yaxis_title='Actual Label',
-        xaxis=dict(tickmode='array', tickvals=list(range(len(unique_labels))), ticktext=unique_labels),
-        yaxis=dict(tickmode='array', tickvals=list(range(len(unique_labels))), ticktext=unique_labels),
+        xaxis=dict(
+            tickmode='array', 
+            tickvals=list(range(len(unique_labels))), 
+            ticktext=[f'<span style="color:{SELECTION_COLOR};">{label}</span>' if i == selected_class_index else label for i, label in enumerate(unique_labels)]
+        ),
+        yaxis=dict(
+            tickmode='array', 
+            tickvals=list(range(len(unique_labels))), 
+            ticktext=[f'<span style="color:{SELECTION_COLOR};">{label}</span>' if i == selected_class_index else label for i, label in enumerate(unique_labels)]
+        ),
         margin=dict(l=20, r=20, t=20, b=20)
     )
 
@@ -137,13 +156,13 @@ def _display_confusion_matrix(cm, unique_labels, selected_class_index):
         type="rect",
         x0=-0.5, x1=len(unique_labels) - 0.5,
         y0=selected_class_index - 0.5, y1=selected_class_index + 0.5,
-        line=dict(color="red", width=1)
+        line=dict(color=SELECTION_COLOR, width=1),
     )
     fig.add_shape(
         type="rect",
         x0=selected_class_index - 0.5, x1=selected_class_index + 0.5,
         y0=-0.5, y1=len(unique_labels) - 0.5,
-        line=dict(color="red", width=1)
+        line=dict(color=SELECTION_COLOR, width=1),
     )
     
     # display the figure
