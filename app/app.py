@@ -9,8 +9,7 @@ import logging
 import os
 
 from error_analysis import visualize_error_analysis
-from feature_importance import visualize_feature_importance
-from feature_importance import visualize_feature_interactions
+from feature_importance import visualize_feature_importance, visualize_feature_interactions
 
 from data import preset_target, preset_training, load_data, prepare_data
 from model import train_model, evaluate_model
