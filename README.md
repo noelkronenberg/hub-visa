@@ -10,8 +10,6 @@ The app is live and hosted on the Streamlit Community Cloud: [visual-a.streamlit
 
 - ```.streamlit``` Streamlit configuration (e.g. server settings) 
 - ```app``` Streamlit-based application
-- ```data-exploration``` exploratory data analysis of raw data
-- ```model-training``` training of different models
 
 ## Milestones
 
