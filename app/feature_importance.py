@@ -3,7 +3,6 @@ import pandas as pd
 import streamlit as st
 import plotly.graph_objects as go
 import shap
-import matplotlib.pyplot as plt
 import numpy as np
 
 def _get_feature_importance(model):

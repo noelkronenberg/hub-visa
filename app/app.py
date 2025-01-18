@@ -1,12 +1,7 @@
 import streamlit as st
 import pandas as pd
-from sklearn.preprocessing import LabelEncoder
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score, f1_score
-from sklearn.model_selection import train_test_split
-import plotly.graph_objects as go
+from sklearn.metrics import accuracy_score
 import logging
-import os
 
 from error_analysis import visualize_error_analysis
 from feature_importance import visualize_feature_importance, visualize_feature_interactions
