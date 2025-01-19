@@ -8,8 +8,23 @@ The app is live and hosted on the Streamlit Community Cloud: [visa-demo.streamli
 
 ## Structure
 
-- ```.streamlit``` Streamlit configuration (e.g. server settings) 
+- ```.streamlit``` Streamlit configuration (e.g. server settings)
+  - `config.toml`: Configuration file for Streamlit server settings.
 - ```app``` Streamlit-based application
+  - `__init__.py`: Initialization file for the app module.
+  - `app.py`: Main application file for the Streamlit dashboard.
+  - `config.py`: Configuration file for general settings used in the app.
+  - `data.py`: Contains functions for loading and preparing data.
+  - `error_analysis.py`: Contains functions for visualizing error analysis.
+  - `feature_importance.py`: Contains functions for visualizing feature importance.
+  - `model.py`: Contains functions for training and evaluating the machine learning model.
+  - `requirements.txt`: Lists the Python packages required to run the app.
+  - `lucas_organic_carbon/`: Directory containing data files for the Lucas Organic Carbon dataset.
+    - `target/`: Directory containing target data files.
+    - `training_test/`: Directory containing training and test data files.
+- ```check_env.py```: Script to check if the required environment and packages are installed.
+- ```environment.yml```: Conda environment configuration file listing the dependencies.
+- ```local-install-instructions.md```: Instructions for setting up the project locally.
 
 ## Milestones
 
