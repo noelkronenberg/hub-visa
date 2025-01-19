@@ -16,6 +16,12 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 st.set_page_config(page_title="VisA Dashboard", layout="wide")
 st.title("VisA Dashboard")
 
+st.write("""
+    This application allows you to upload your own data, train a machine learning model, 
+    and explore the results through various visualizations. Start by uploading your data 
+    and configuring the model parameters in the sidebar.
+""")
+
 # -----------------------------------------------------------
 # Sidebar
 # -----------------------------------------------------------
@@ -245,7 +251,7 @@ with tab2:
     # show placeholder
     if 'first_run' not in st.session_state:
         placeholder = st.empty()
-        placeholder.warning("Adjust the parameters and run the model to view results.")
+        placeholder.warning("Please train the model first to view error analysis.")
         logging.info("Placeholder displayed successfully.")
 
     # show results
