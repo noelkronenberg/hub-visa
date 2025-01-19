@@ -19,7 +19,7 @@ st.title("VisA Dashboard")
 
 st.write("""
     This application allows you to upload your own data, train a machine learning model, 
-    and explore the results through various visualizations. Start by uploading your data 
+    and explore the results through various visualizations. Start by (optionally) uploading your data 
     and configuring the model parameters in the sidebar. When the desired results are achieved, 
     you can download the trained model.
 """)
