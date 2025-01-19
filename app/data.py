@@ -34,7 +34,13 @@ preset_training = demo_cases['Lucas Organic Carbon']['training']
 def load_data(load_preset_target, load_preset_training, target_data=None, training_data=None, selected_demo_case='Lucas Organic Carbon'):
     """
     Load the data for training.
+    
+    Parameters:
+    - load_preset_target: Deprecated. Use selected_demo_case instead. 
+    - load_preset_training: Deprecated. Use selected_demo_case instead.
     """
+
+    # TODO: remove load_preset_target and load_preset_training in future versions
     
     # load data from sklearn
     if 'sklearn_dataset' in demo_cases[selected_demo_case]:
@@ -65,14 +71,14 @@ def load_data(load_preset_target, load_preset_training, target_data=None, traini
 
     # load data from presets
     else:
-        if load_preset_target:
-            df_target = pd.read_csv(demo_cases[selected_demo_case]['target'])
-            logging.info("Loaded target data from preset.")
-        if load_preset_training:
-            df_training = pd.read_csv(demo_cases[selected_demo_case]['training'])
-            logging.info("Loaded training data from preset.")
+        df_target = pd.read_csv(demo_cases[selected_demo_case]['target'])
+        logging.info("Loaded target data from preset.")
 
+        df_training = pd.read_csv(demo_cases[selected_demo_case]['training'])
+        logging.info("Loaded training data from preset.")
+        
         df_combined = pd.merge(df_training, df_target, left_index=True, right_index=True)
+        logging.info("Merged target and training data successfully.")
 
     return df_training, df_target, df_combined
 
