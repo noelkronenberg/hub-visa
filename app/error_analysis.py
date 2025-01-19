@@ -122,7 +122,7 @@ def _display_confusion_matrix(cm, unique_labels, selected_class_index):
         y=[f'{label}' for label in unique_labels],
         colorscale='Blues',
         showscale=True,
-        hovertemplate='Predicted: %{x}<br>Actual: %{y}<br>Count: %{z}<extra></extra>'
+        hovertemplate='Predicted: %{x}<br>Actual: %{y}<br>Value: %{z}<extra></extra>'
     ))
 
     # confusion matrix: improve layout 
