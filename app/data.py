@@ -59,68 +59,74 @@ def plot_target_distribution(df_combined):
     Plot target distribution.
     """
 
+    target_column = df_combined.columns[-1]
+
     # create histogram
-    fig = px.histogram(df_combined, x='x', color='x', title='', 
-                       labels={'x': 'Carbon Concentration Class'}, 
+    fig = px.histogram(df_combined, x=target_column, color=target_column, title='', 
+                       labels={target_column: 'Target Class'}, 
                        template='plotly_dark',
-                       category_orders={'x': df_combined['x'].value_counts().index})
-    fig.update_layout(margin=dict(l=20, r=20, t=20, b=20))
+                       category_orders={target_column: df_combined[target_column].value_counts().index})
+    fig.update_layout(margin=dict(l=20, r=20, t=20, b=20), yaxis_title='Count')
 
     # update hover template
     fig.update_traces(hovertemplate='Class: %{x}<br>Count: %{y}<extra></extra>')
 
     # display the figure
     with st.expander("**Target Distribution**", expanded=True):
-        st.plotly_chart(fig)
+        st.plotly_chart(fig, key='target_distribution')
         logging.info("Target distribution displayed successfully.")
 
-def plot_spectral_profiles(df_combined):
+def plot_feature_profiles(df_combined):
     """
-    Plot spectral profiles.
-    """
-
-    with st.expander("**Spectral Profiles**", expanded=True):
-        # sample spectral profiles
-        num_samples = st.slider('Number of Samples', min_value=1, max_value=10, value=3, key='num_samples_spectral')
-
-        # select a few spectral profiles to display
-        sample_spectral_profiles = df_combined.sample(num_samples).drop(columns=['x'])
-
-        # plot spectral profiles
-        fig_spectral = px.line(title='')
-        for idx, row in sample_spectral_profiles.iterrows():
-            fig_spectral.add_scatter(x=row.index.astype(float), y=row.values, mode='lines', name=f'Sample {idx}', hovertemplate='Wavelength: %{x}<br>Spectral Value: %{y}<extra></extra>')
-        fig_spectral.update_layout(xaxis_title='Wavelength', yaxis_title='Spectral Value', template='plotly_dark', margin=dict(l=20, r=20, t=20, b=20))
-        st.plotly_chart(fig_spectral)
-
-        logging.info("Spectral profiles displayed successfully.")
-
-def plot_wavelength_distribution(df_combined):
-    """
-    Plot wavelength distribution.
+    Plot feature profiles.
     """
 
-    # select a few wavelengths to display (first, 1/4, 1/2, 3/4, last)
-    wavelength_columns = df_combined.columns[:-1]
-    selected_wavelengths = [
-        wavelength_columns[0],
-        wavelength_columns[len(wavelength_columns) // 4],
-        wavelength_columns[len(wavelength_columns) // 2],
-        wavelength_columns[3 * len(wavelength_columns) // 4],
-        wavelength_columns[-1]
+    target_column = df_combined.columns[-1]
+
+    with st.expander("**Feature Profiles**", expanded=True):
+        # sample feature profiles
+        num_samples = st.slider('Number of Samples', min_value=1, max_value=10, value=3, key='num_samples_feature')
+
+        # select a few feature profiles to display
+        sample_feature_profiles = df_combined.sample(num_samples).drop(columns=[target_column])
+
+        # plot feature profiles
+        fig_feature = px.line(title='')
+        for idx, row in sample_feature_profiles.iterrows():
+            fig_feature.add_scatter(x=row.index.astype(float), y=row.values, mode='lines', name=f'Sample {idx}', hovertemplate='Feature: %{x}<br>Value: %{y}<extra></extra>')
+        fig_feature.update_layout(xaxis_title='Feature', yaxis_title='Value', template='plotly_dark', margin=dict(l=20, r=20, t=20, b=20))
+        st.plotly_chart(fig_feature, key='feature_profiles')
+
+        logging.info("Feature profiles displayed successfully.")
+
+def plot_feature_distribution(df_combined):
+    """
+    Plot feature distribution.
+    """
+
+    target_column = df_combined.columns[-1]
+
+    # select a few features to display (first, 1/4, 1/2, 3/4, last)
+    feature_columns = df_combined.columns[:-1]
+    selected_features = [
+        feature_columns[0],
+        feature_columns[len(feature_columns) // 4],
+        feature_columns[len(feature_columns) // 2],
+        feature_columns[3 * len(feature_columns) // 4],
+        feature_columns[-1]
     ]
 
     # melt the DataFrame for plotting (wide to long format)
-    df_melted = df_combined.melt(id_vars='x', value_vars=selected_wavelengths, var_name='Wavelength', value_name='Value')
+    df_melted = df_combined.melt(id_vars=target_column, value_vars=selected_features, var_name='Feature', value_name='Value')
 
     # create box plot
-    fig_boxplot = px.box(df_melted, x='Wavelength', y='Value', color='x', title='', template='plotly_dark')
+    fig_boxplot = px.box(df_melted, x='Feature', y='Value', color=target_column, title='', template='plotly_dark')
     fig_boxplot.update_layout(margin=dict(l=20, r=20, t=20, b=20))
 
     # update hover template
-    fig_boxplot.update_traces(hovertemplate='Wavelength: %{x}<br>Value: %{y}<extra></extra>')
+    fig_boxplot.update_traces(hovertemplate='Feature: %{x}<br>Value: %{y}<extra></extra>')
 
     # display the figure
-    with st.expander("**Wavelength Distribution**", expanded=True):
-        st.plotly_chart(fig_boxplot)
-        logging.info("Wavelength distribution displayed successfully.")
+    with st.expander("**Feature Distribution**", expanded=True):
+        st.plotly_chart(fig_boxplot, key='feature_distribution')
+        logging.info("Feature distribution displayed successfully.")

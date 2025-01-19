@@ -7,7 +7,7 @@ import pickle
 from error_analysis import visualize_error_analysis
 from feature_importance import visualize_feature_importance
 
-from data import preset_target, preset_training, load_data, prepare_data, plot_target_distribution, plot_spectral_profiles, plot_wavelength_distribution
+from data import preset_target, preset_training, load_data, prepare_data, plot_target_distribution, plot_feature_profiles, plot_feature_distribution
 from model import train_model, evaluate_model
 
 # configure logging
@@ -249,8 +249,8 @@ with tab1:
         df_combined = pd.concat([st.session_state['training_data'], st.session_state['target_data']], axis=1)
 
         plot_target_distribution(df_combined)
-        plot_spectral_profiles(df_combined)
-        plot_wavelength_distribution(df_combined)
+        plot_feature_profiles(df_combined)
+        plot_feature_distribution(df_combined)
         
         logging.info("Data exploration displayed successfully.")
 
