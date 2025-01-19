@@ -31,7 +31,7 @@ this repository:
 
 ```sh
 # Activate your conda environment
-conda activate hackathon_parallel_computing
+conda activate semester_project_group_a
 python check_env.py
 ```
 
