@@ -7,7 +7,7 @@ import pickle
 from error_analysis import visualize_error_analysis
 from feature_importance import visualize_feature_importance
 
-from data import preset_target, preset_training, load_data, prepare_data, plot_target_distribution, plot_feature_profiles, plot_feature_distribution
+from data import demo_cases, preset_target, preset_training, load_data, prepare_data, plot_target_distribution, plot_feature_profiles, plot_feature_distribution
 from model import train_model, evaluate_model
 
 # configure logging
@@ -32,18 +32,26 @@ st.sidebar.header("Settings")
 
 # sidebar for data exploration
 with st.sidebar.expander("**Data**", expanded=False):
+
+    # user selects the demo case
+    st.session_state.selected_demo_case = st.selectbox('Select Demo Case', list(demo_cases.keys()))
+
     # file upload
     target_file = st.file_uploader("Upload Target CSV", type=["csv"])
     training_file = st.file_uploader("Upload Training CSV", type=["csv"])
 
     # load data
+    st.session_state['custom_target'] = False
     if target_file is not None:
+        st.session_state['custom_target'] = True
         df_target = pd.read_csv(target_file)
         st.session_state['target_data'] = df_target
         logging.info("Added target file to session state.")
 
     # load data
+    st.session_state['custom_training'] = False
     if training_file is not None:
+        st.session_state['custom_training'] = True
         df_training = pd.read_csv(training_file)
         st.session_state['training_data'] = df_training
         logging.info("Added training file to session state.")
@@ -56,7 +64,7 @@ if 'max_depth' not in st.session_state:
 if 'n_estimators' not in st.session_state:
     st.session_state.n_estimators = 384
 if 'data_percentage' not in st.session_state:
-    st.session_state.data_percentage = 1
+    st.session_state.data_percentage = 10
 if 'normalize_cm' not in st.session_state:
     st.session_state.normalize_cm = True
 if 'min_samples_split' not in st.session_state:
@@ -112,6 +120,15 @@ with st.sidebar.expander("**Model**", expanded=True):
         value=st.session_state.data_percentage
     )
 
+    # check if the resulting data is too small or none
+    if data_percentage != st.session_state.data_percentage:
+        df_combined = pd.concat([st.session_state['training_data'], st.session_state['target_data']], axis=1)
+        _, _, _, _, label_encoder = prepare_data(df_combined, data_percentage)
+        if label_encoder is None or len(label_encoder.classes_) == 0:
+            st.warning("The resulting data is too small or none. Please choose a higher percentage.")
+            logging.warning("The resulting data is too small or none. Please choose a higher percentage.")
+            data_percentage = st.session_state.data_percentage
+
     normalize_cm = st.checkbox(
         'Normalize Confusion Matrix', 
         value=st.session_state.normalize_cm
@@ -149,43 +166,64 @@ with st.sidebar.expander("**Model**", expanded=True):
             load_preset_target = 'target_data' not in st.session_state
             load_preset_training = 'training_data' not in st.session_state
             st.session_state['training_data'], st.session_state['target_data'], df_combined = load_data(
-                load_preset_target, 
-                load_preset_training,
-                st.session_state['target_data'] if not load_preset_target else None,
-                st.session_state['training_data'] if not load_preset_training else None
-            )
-            logging.info("Data loaded successfully.")
+                load_preset_target=load_preset_target, 
+                load_preset_training=load_preset_training,
+                target_data=st.session_state['target_data'] if not load_preset_target else None,
+                training_data=st.session_state['training_data'] if not load_preset_training else None,
+                selected_demo_case=st.session_state.selected_demo_case
+            ) 
 
-            # prepare data
-            X_train, st.session_state.X_test, y_train, st.session_state.y_test, st.session_state.label_encoder \
-                = prepare_data(df_combined, data_percentage)
-            logging.info("Data prepared successfully.")
+            if df_combined is None:
+                logging.error("Data loading failed. Please adjust data settings.")
+            else:
+                logging.info("Data loaded successfully.")
+
+                # prepare data
+                X_train, st.session_state.X_test, y_train, st.session_state.y_test, st.session_state.label_encoder \
+                    = prepare_data(df_combined, data_percentage)
+                logging.info("Data prepared successfully.")
 
         # spinner while training model
         with st.spinner('Training the model...'):
-            st.session_state.rf_classifier = train_model(
-                X_train, 
-                y_train, 
-                max_depth, 
-                n_estimators, 
-                min_samples_split, 
-                min_samples_leaf, 
-                max_features
-            )
-            st.session_state.y_pred = st.session_state.rf_classifier.predict(st.session_state.X_test)
-            logging.info("Model trained successfully.")
 
-        # spinner while evaluating
-        with st.spinner('Evaluating the model...'):
-            st.session_state.accuracy, st.session_state.precision, st.session_state.recall, \
-                st.session_state.f1, st.session_state.unique_labels, st.session_state.cm = evaluate_model(
-                    st.session_state.y_test, 
-                    st.session_state.y_pred, 
-                    st.session_state.label_encoder, 
-                    st.session_state.normalize_cm
+            # check if data loading failed
+            try:
+                # check data is not None or long enough
+                if (X_train is None) or (y_train is None) or (st.session_state.X_test is None) or (st.session_state.y_test is None):
+                    logging.error("Data preparation failed. Please adjust percentage of data used.")
+                    st.session_state.data_error = True
+                else:
+                    st.session_state.data_error = False
+            except NameError:
+                st.session_state.data_error = True
+
+            if st.session_state.data_error:
+                pass
+            else:
+                # train the model
+                st.session_state.rf_classifier = train_model(
+                    X_train, 
+                    y_train, 
+                    max_depth, 
+                    n_estimators, 
+                    min_samples_split, 
+                    min_samples_leaf, 
+                    max_features
                 )
-        
-        st.session_state.first_run = False
+                st.session_state.y_pred = st.session_state.rf_classifier.predict(st.session_state.X_test)
+                logging.info("Model trained successfully.")
+
+            # spinner while evaluating
+            with st.spinner('Evaluating the model...'):
+                st.session_state.accuracy, st.session_state.precision, st.session_state.recall, \
+                    st.session_state.f1, st.session_state.unique_labels, st.session_state.cm = evaluate_model(
+                        st.session_state.y_test, 
+                        st.session_state.y_pred, 
+                        st.session_state.label_encoder, 
+                        st.session_state.normalize_cm
+                    )
+            
+            st.session_state.first_run = False
 
     # download model button
     if 'rf_classifier' in st.session_state:
@@ -245,7 +283,8 @@ with tab1:
     if 'first_run' not in st.session_state:
         st.warning("Please train the model first to view data exploration.")
 
-    else:
+    # check whether data is loaded
+    elif not st.session_state.data_error:
         df_combined = pd.concat([st.session_state['training_data'], st.session_state['target_data']], axis=1)
 
         plot_target_distribution(df_combined)
@@ -253,6 +292,9 @@ with tab1:
         plot_feature_distribution(df_combined)
         
         logging.info("Data exploration displayed successfully.")
+    else:
+        st.error("Data preparation failed. Full custom data are likely not provided. Please upload both target and training data.")
+        logging.error("Data preparation failed. Full custom data are likely not provided. Please upload both target and training data.")
 
 # -----------------------------------------------------------
 # Explorative Error Analysis
@@ -261,13 +303,11 @@ with tab1:
 with tab2:
 
     # show placeholder
-    if 'first_run' not in st.session_state:
+    if 'first_run' not in st.session_state or st.session_state.data_error:
         placeholder = st.empty()
         placeholder.warning("Please train the model first to view error analysis.")
         logging.info("Placeholder displayed successfully.")
-
-    # show results
-    if 'first_run' in st.session_state:
+    else:
         visualize_error_analysis(
             st.session_state.y_test, 
             st.session_state.y_pred, 
@@ -287,7 +327,7 @@ with tab2:
 # -----------------------------------------------------------
 
 with tab3:
-    if 'first_run' not in st.session_state:
+    if 'first_run' not in st.session_state or st.session_state.data_error:
         st.warning("Please train the model first to view feature analysis.")
     else:
         visualize_feature_importance(
