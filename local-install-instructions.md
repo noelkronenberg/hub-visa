@@ -1,7 +1,6 @@
 # Local install instructions
 
-The course uses Python 3 and some data analysis packages such as numpy, pandas,
-scikit-learn, and matplotlib.
+The project uses Python 3 and some data analysis packages.
 
 ## Install Miniconda
 
