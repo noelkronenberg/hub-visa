@@ -8,9 +8,9 @@ The app is live and hosted on the Streamlit Community Cloud: [visa-demo.streamli
 
 ## Structure
 
-- ```.streamlit/``` Streamlit configuration (e.g. server settings)
+- ```.streamlit/``` Directory containing Streamlit configurations.
   - `config.toml` Configuration file for Streamlit server settings.
-- ```app/``` Streamlit-based application
+- ```app/``` Directory containing Streamlit application files.
   - `__init__.py` Initialization file for the app module.
   - `app.py` Main application file for the Streamlit dashboard.
   - `config.py` Configuration file for general settings used in the app.
