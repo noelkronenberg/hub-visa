@@ -35,7 +35,7 @@ python check_env.py
 ```
 
 Make sure that there is no `FAIL` in the output when running the `check_env.py`
-script, i.e. that its output looks similar to this:
+script.
 
 ## Open web app
 
