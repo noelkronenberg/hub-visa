@@ -34,7 +34,7 @@ st.sidebar.header("Settings")
 with st.sidebar.expander("**Data**", expanded=False):
 
     # user selects the demo case
-    st.session_state.selected_demo_case = st.selectbox('Select Demo Case', list(demo_cases.keys()))
+    st.session_state.selected_demo_case = st.selectbox('Select Dataset', list(demo_cases.keys()))
 
     # file upload
     target_file = st.file_uploader("Upload Target CSV", type=["csv"])
