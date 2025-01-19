@@ -1,18 +1,13 @@
 import streamlit as st
 import pandas as pd
-from sklearn.preprocessing import LabelEncoder
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score, f1_score
-from sklearn.model_selection import train_test_split
-import plotly.graph_objects as go
+from sklearn.metrics import accuracy_score
 import logging
-import os
+import pickle
 
 from error_analysis import visualize_error_analysis
 from feature_importance import visualize_feature_importance
-from feature_importance import visualize_feature_interactions
 
-from data import preset_target, preset_training, load_data, prepare_data
+from data import preset_target, preset_training, load_data, prepare_data, plot_target_distribution, plot_spectral_profiles, plot_wavelength_distribution
 from model import train_model, evaluate_model
 
 # configure logging
@@ -21,6 +16,13 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 # streamlit app
 st.set_page_config(page_title="VisA Dashboard", layout="wide")
 st.title("VisA Dashboard")
+
+st.write("""
+    This application allows you to upload your own data, train a machine learning model, 
+    and explore the results through various visualizations. Start by uploading your data 
+    and configuring the model parameters in the sidebar. When the desired results are achieved, 
+    you can download the trained model.
+""")
 
 # -----------------------------------------------------------
 # Sidebar
@@ -34,15 +36,17 @@ with st.sidebar.expander("**Data**", expanded=False):
     target_file = st.file_uploader("Upload Target CSV", type=["csv"])
     training_file = st.file_uploader("Upload Training CSV", type=["csv"])
 
+    # load data
     if target_file is not None:
         df_target = pd.read_csv(target_file)
         st.session_state['target_data'] = df_target
         logging.info("Added target file to session state.")
 
-        if training_file is not None:
-            df_training = pd.read_csv(training_file)
-            st.session_state['training_data'] = df_training
-            logging.info("Added training file to session state.")
+    # load data
+    if training_file is not None:
+        df_training = pd.read_csv(training_file)
+        st.session_state['training_data'] = df_training
+        logging.info("Added training file to session state.")
 
     show_data = st.checkbox('Show raw data')
 
@@ -183,6 +187,16 @@ with st.sidebar.expander("**Model**", expanded=True):
         
         st.session_state.first_run = False
 
+    # download model button
+    if 'rf_classifier' in st.session_state:
+        model_bytes = pickle.dumps(st.session_state.rf_classifier)
+        st.download_button(
+            label="Download Model",
+            data=model_bytes,
+            file_name="trained_model.pkl",
+            mime="application/octet-stream"
+        )
+
 # show results
 if 'first_run' in st.session_state:
 
@@ -206,10 +220,10 @@ if 'first_run' in st.session_state:
     # update selected class index when the selected class changes
     st.session_state.selected_class_index = list(st.session_state.unique_labels).index(st.session_state.selected_class)
 
-tab1, tab2 = st.tabs(["Explorative Error Analysis", "Feature Importance & Interactions"])
+tab1, tab2, tab3 = st.tabs([ "Data Exploration", "Explorative Error Analysis", "Feature Importance"])
 
 # -----------------------------------------------------------
-# Explorative Error Analysis
+# Data Exploration
 # -----------------------------------------------------------
 
 with tab1:
@@ -228,10 +242,28 @@ with tab1:
             
             logging.info("Raw data displayed successfully.")
 
+    if 'first_run' not in st.session_state:
+        st.warning("Please train the model first to view data exploration.")
+
+    else:
+        df_combined = pd.concat([st.session_state['training_data'], st.session_state['target_data']], axis=1)
+
+        plot_target_distribution(df_combined)
+        plot_spectral_profiles(df_combined)
+        plot_wavelength_distribution(df_combined)
+        
+        logging.info("Data exploration displayed successfully.")
+
+# -----------------------------------------------------------
+# Explorative Error Analysis
+# -----------------------------------------------------------
+
+with tab2:
+
     # show placeholder
     if 'first_run' not in st.session_state:
         placeholder = st.empty()
-        placeholder.warning("Adjust the parameters and run the model to view results.")
+        placeholder.warning("Please train the model first to view error analysis.")
         logging.info("Placeholder displayed successfully.")
 
     # show results
@@ -254,20 +286,11 @@ with tab1:
 # Feature Importance & Interactions
 # -----------------------------------------------------------
 
-with tab2:
+with tab3:
     if 'first_run' not in st.session_state:
         st.warning("Please train the model first to view feature analysis.")
     else:
         visualize_feature_importance(
-            st.session_state.rf_classifier,
-            st.session_state.X_test,        
-            st.session_state.X_test.columns
+            st.session_state.rf_classifier
         )
         logging.info("Feature importance displayed successfully.")
-            
-        visualize_feature_interactions(
-            st.session_state.rf_classifier,
-            st.session_state.X_test,
-            st.session_state.X_test.columns
-        )
-        logging.info("Feature interactions displayed successfully.")

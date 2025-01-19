@@ -67,10 +67,7 @@ requirements = {
     "streamlit": "1.40.2",
     "pandas": "2.1.4",
     "scikit-learn": "1.4.2",
-    "plotly": "5.24.1",
-    "shap": "0.46.0",
-    "matplotlib": "3.7.5",
-    "numpy": "1.23.5"
+    "plotly": "5.24.1"
 }
 
 # now the dependencies

@@ -1,0 +1,3 @@
+RED = "#ff4c4c"
+BLUE = "#007bff"
+SELECTION_COLOR = RED

@@ -13,6 +13,7 @@ def train_model(X_train, y_train, max_depth, n_estimators, min_samples_split, mi
     """
     Train a Random Forest Classifier model.
     """
+    
     rf_classifier = RandomForestClassifier(
         max_depth=max_depth,
         n_estimators=n_estimators,
@@ -20,13 +21,16 @@ def train_model(X_train, y_train, max_depth, n_estimators, min_samples_split, mi
         min_samples_leaf=min_samples_leaf,
         max_features=max_features
     )
+    
     rf_classifier.fit(X_train, y_train)
+    
     return rf_classifier
 
 def evaluate_model(y_test, y_pred, label_encoder, normalize_cm):
     """
     Evaluate a Random Forest Classifier model.
     """
+    
     # compute metrics (and save in session state)
     accuracy = accuracy_score(y_test, y_pred)
     precision = precision_score(y_test, y_pred, average='weighted')
