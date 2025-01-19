@@ -52,11 +52,11 @@ The app is live and hosted on the Streamlit Community Cloud: [visa-demo.streamli
 | C5  | Dynamic Model Training        | Allow user to change model parameters to retrain the model dynamically.                                         | done   | M4        |
 | C6  | Faster UX                     | Enable faster loading times and improve usability.                                                              | done   | M4        |
 | C7  | Class Selection               | Allow users to select a specific target class to view evaluation metrics.                                       | done   | M4        |
-| C8  | Overview of Importance Scores | Show importance scores for each feature as bar chart.                                                           | open   | M6        |
+| C8  | Overview of Importance Scores | Show importance scores for each feature as bar chart.                                                           | done   | M6        |
 | C9  | Impact of Intervals           | Show the average impact of intervals as beeswarm.                                                               | open   | M6        |
 | C10 | Impact of 2-D Intervals       | Show the average impact of 2-D intervals as heatmap.                                                            | open   | M6        |
 | C11 | Interval Settings             | Allow the user to change settings for intervals (e.g. number of intervals).                                     | open   | M6        |
-| C12 | Improved Division of Tasks    | Allow the user to focus on a single task (e.g. model training, error exploration, investigation of importance). | open   | M6        |
+| C12 | Improved Division of Tasks    | Allow the user to focus on a single task (e.g. model training, error exploration, investigation of importance). | done   | M6        |
 
 
 ## Activities
