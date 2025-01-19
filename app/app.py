@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 from sklearn.metrics import accuracy_score
 import logging
+import pickle
 
 from error_analysis import visualize_error_analysis
 from feature_importance import visualize_feature_importance
@@ -19,7 +20,8 @@ st.title("VisA Dashboard")
 st.write("""
     This application allows you to upload your own data, train a machine learning model, 
     and explore the results through various visualizations. Start by uploading your data 
-    and configuring the model parameters in the sidebar.
+    and configuring the model parameters in the sidebar. When the desired results are achieved, 
+    you can download the trained model.
 """)
 
 # -----------------------------------------------------------
@@ -184,6 +186,16 @@ with st.sidebar.expander("**Model**", expanded=True):
                 )
         
         st.session_state.first_run = False
+
+    # download model button
+    if 'rf_classifier' in st.session_state:
+        model_bytes = pickle.dumps(st.session_state.rf_classifier)
+        st.download_button(
+            label="Download Model",
+            data=model_bytes,
+            file_name="trained_model.pkl",
+            mime="application/octet-stream"
+        )
 
 # show results
 if 'first_run' in st.session_state:
