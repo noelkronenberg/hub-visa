@@ -4,7 +4,7 @@ import streamlit as st
 from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score, f1_score
 import plotly.graph_objects as go
 
-from config import SELECTION_COLOR
+from config import SELECTION_COLOR, BLUE
 
 def _display_overall_metrics(accuracy, precision, recall, f1):
     """
@@ -115,12 +115,11 @@ def _display_confusion_matrix(cm, unique_labels, selected_class_index):
     """
     Display the confusion matrix.
     """
-
     fig = go.Figure(data=go.Heatmap(
         z=cm,
         x=[f'{label}' for label in unique_labels],
         y=[f'{label}' for label in unique_labels],
-        colorscale='Blues',
+        colorscale=[[0, 'white'], [1, BLUE]],
         showscale=True,
         hovertemplate='Predicted: %{x}<br>Actual: %{y}<br>Value: %{z}<extra></extra>'
     ))
