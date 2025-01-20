@@ -5,8 +5,7 @@ import logging
 import pickle
 
 from services.error_analysis import visualize_error_analysis
-from services.feature_importance import visualize_feature_importance
-
+from services.feature_importance import visualize_feature_importance, visualize_interval_importance
 from services.data import demo_cases, preset_target, preset_training, load_data, prepare_data, plot_target_distribution, plot_feature_profiles, plot_feature_distribution
 from services.model import train_model, evaluate_model
 
@@ -334,3 +333,41 @@ with tab3:
             st.session_state.rf_classifier
         )
         logging.info("Feature importance displayed successfully.")
+
+        with st.expander("**Interval Importance**", expanded=True):
+
+            # get feature importances
+            importances = st.session_state.rf_classifier.feature_importances_
+            feature_names = st.session_state.X_test.columns
+            feature_importance_df = pd.DataFrame({'feature': feature_names, 'importance': importances})
+            feature_importance_df = feature_importance_df.sort_values(by='importance', ascending=False)
+
+            # preselect feature with highest importance
+            selected_feature = st.selectbox(
+                "Select Feature", 
+                feature_importance_df['feature'], 
+                index=0
+            )
+            logging.info(f"Feature selected successfully: {selected_feature}")
+
+            # get index of selected feature
+            feature_index = list(st.session_state.X_test.columns).index(selected_feature)
+            logging.info(f"Feature index: {feature_index}")
+        
+            # ask user how many intervals to define
+            num_intervals = st.slider(
+                'Number of Intervals', 
+                min_value=1, 
+                max_value=20, 
+                value=10
+            )
+            logging.info(f"CHose number of intervals: {num_intervals}")
+
+            # plot interval importance
+            visualize_interval_importance(
+                st.session_state.rf_classifier,
+                st.session_state.X_test, 
+                st.session_state.y_test, 
+                feature_index, 
+                num_intervals
+            )

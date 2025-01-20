@@ -1,8 +1,10 @@
 import logging
 import pandas as pd
+import numpy as np
 import streamlit as st
 import plotly.graph_objects as go
 
+from services.model import evaluate_model
 from config import RED
 
 def _get_feature_importance(model):
@@ -71,3 +73,167 @@ def visualize_feature_importance(model):
 
         st.plotly_chart(fig, use_container_width=True)
         logging.info("Feature importance displayed successfully.")
+
+def _define_intervals(X_test, feature_index=0, num_intervals=10):
+    """
+    Define intervals for a given feature.
+    """
+
+    min_val = X_test.iloc[:, feature_index].min()
+    max_val = X_test.iloc[:, feature_index].max()
+    intervals = np.linspace(min_val, max_val, num_intervals+1)
+
+    return intervals
+
+def _interval_importance(model, X_test, y_test, feature_index=0, num_intervals=10):
+    """
+    Use transform_left parameter to map both to the left interval limit or the right interval limit.
+    """
+
+    # get original evaluation metrics
+    accuracy = st.session_state.accuracy
+    precision = st.session_state.precision
+    recall = st.session_state.recall
+    f1 = st.session_state.f1
+
+    # define intervals
+    intervals = _define_intervals(X_test, feature_index, num_intervals)
+    
+    # initialize lists to store the differences in error metrics
+    accuracy_diffs = []
+    precision_diffs = []
+    recall_diffs = []
+    f1_diffs = []
+
+    # iterate over each interval
+    for i in range(len(intervals) - 1):
+
+        # create a copy of X_test
+        X_test_transformed_left = X_test.copy()
+        X_test_transformed_right = X_test.copy()
+        
+        # transform the interval to the left   
+        cut_series = pd.cut(X_test.iloc[:, feature_index], bins=[intervals[i], intervals[i+1]], labels=[intervals[i]], include_lowest=True)
+        cut_series = cut_series.astype('float')
+        cut_series.fillna(X_test.iloc[:,0], inplace=True)
+        X_test_transformed_left.iloc[:, feature_index] = cut_series
+
+        # transform the interval to the right
+        cut_series = pd.cut(X_test.iloc[:, feature_index], bins=[intervals[i], intervals[i+1]], labels=[intervals[i+1]], include_lowest=True)
+        cut_series = cut_series.astype('float')
+        cut_series.fillna(X_test.iloc[:,0], inplace=True)
+        X_test_transformed_right.iloc[:, feature_index] = cut_series
+
+        # merge the transformed dataframes
+        X_test_transformed = pd.concat([X_test_transformed_left, X_test_transformed_right], axis=0)
+
+        # predict using the transformed test set
+        y_pred_transformed = model.predict(X_test_transformed)
+        
+        # evaluate the model
+        y_test_transformed = pd.concat([y_test, y_test], axis=0)
+        accuracy_transformed, precision_transformed, recall_transformed, f1_transformed = evaluate_model(y_test_transformed, y_pred_transformed)
+        
+        # calculate the differences in error metrics
+        accuracy_diff = accuracy - accuracy_transformed
+        precision_diff = precision - precision_transformed
+        recall_diff = recall - recall_transformed
+        f1_diff = f1 - f1_transformed
+        
+        # append the differences to the lists
+        accuracy_diffs.append(accuracy_diff)
+        precision_diffs.append(precision_diff)
+        recall_diffs.append(recall_diff)
+        f1_diffs.append(f1_diff)
+
+    accuracy_diffs = np.array(accuracy_diffs)
+    precision_diffs = np.array(precision_diffs)
+    recall_diffs = np.array(recall_diffs)
+    f1_diffs = np.array(f1_diffs)
+    
+    return accuracy_diffs, precision_diffs, recall_diffs, f1_diffs
+
+def visualize_interval_importance(model, X_test, y_test, feature_index=0, num_intervals=10):
+    """
+    Visualize interval importance using transform_left parameter.
+    """
+
+    # ensure X_test and y_test are DataFrames
+    if not isinstance(X_test, pd.DataFrame):
+        X_test = pd.DataFrame(X_test)
+        logging.info(f"X_test and y_test converted to DataFrames successfully.")
+    if not isinstance(y_test, pd.DataFrame):
+        y_test = pd.DataFrame(y_test)
+        logging.info(f"X_test and y_test converted to DataFrames successfully.")
+
+    # get differences in error metrics
+    accuracy_diffs, precision_diffs, recall_diffs, f1_diffs = _interval_importance(model, X_test, y_test, feature_index, num_intervals)
+    logging.info(f"Differences in error metrics calculated successfully: {accuracy_diffs}, {precision_diffs}, {recall_diffs}, {f1_diffs}")
+
+    # define intervals
+    intervals = _define_intervals(X_test, feature_index, num_intervals)
+
+    # Check if all differences are zero
+    if np.all(accuracy_diffs == 0):
+        st.warning("The differences in error metrics are too small to display meaningful charts. Try a different feature or larger dataset.")
+        logging.warning("The differences in error metrics are too small to display meaningful charts. Try a different feature or larger dataset.")
+        return
+
+    # create line chart
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(
+        x=intervals[1:], y=accuracy_diffs, mode='lines+markers', name='Accuracy', 
+        line=dict(color='blue'),
+        hovertemplate='Interval: %{x}<br>Accuracy Difference: %{y:.4f}<extra></extra>'
+    ))
+    fig.add_trace(go.Scatter(
+        x=intervals[1:], y=precision_diffs, mode='lines+markers', name='Precision', 
+        line=dict(color='green'),
+        hovertemplate='Interval: %{x}<br>Precision Difference: %{y:.4f}<extra></extra>'
+    ))
+    fig.add_trace(go.Scatter(
+        x=intervals[1:], y=recall_diffs, mode='lines+markers', name='Recall', 
+        line=dict(color='red'),
+        hovertemplate='Interval: %{x}<br>Recall Difference: %{y:.4f}<extra></extra>'
+    ))
+    fig.add_trace(go.Scatter(
+        x=intervals[1:], y=f1_diffs, mode='lines+markers', name='F1', 
+        line=dict(color='purple'),
+        hovertemplate='Interval: %{x}<br>F1 Difference: %{y:.4f}<extra></extra>'
+    ))
+
+    # update layout
+    fig.update_layout(
+        title='',
+        xaxis_title='Intervals',
+        yaxis_title='Difference in Error Metric',
+        margin=dict(l=20, r=20, t=20, b=20),
+        height=600,
+        showlegend=True,
+    )
+
+    # display feature importance
+    st.plotly_chart(fig, use_container_width=True)
+    logging.info("Interval importance displayed successfully.")
+
+    # bar chart for accuracy_diffs
+    fig = go.Figure(data=go.Bar(
+        x=intervals[1:],
+        y=accuracy_diffs,
+        marker_color=RED,
+        textposition='auto',
+        hovertemplate='Interval: %{x}<br>Accuracy Difference: %{y:.4f}<extra></extra>'
+    ))
+
+    # update layout
+    fig.update_layout(
+        title='',
+        xaxis_title='Intervals',
+        yaxis_title='Difference in Accuracy',
+        margin=dict(l=20, r=20, t=20, b=20),
+        height=600,
+        showlegend=False
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+    logging.info("Accuracy differences displayed successfully.")
