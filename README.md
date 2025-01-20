@@ -2,12 +2,16 @@
 
 Visual analytics app for exploring machine learning classifications.
 
+[![Unit Tests](https://github.com/noelkronenberg/hub-visa/actions/workflows/tests.yml/badge.svg)](https://github.com/noelkronenberg/hub-visa/actions/workflows/tests.yml)
+
 ## Showcase
 
 The app is live and hosted on the Streamlit Community Cloud: [visa-demo.streamlit.app](https://visa-demo.streamlit.app/)
 
 ## Structure
 
+- ```.github/workflows/``` Directory containing GitHub Actions configurations.
+-   - `tests.yml` Configuration for running unit tests on commit.
 - ```.streamlit/``` Directory containing Streamlit configurations.
   - `config.toml` Configuration file for Streamlit server settings.
 - ```app/``` Directory containing Streamlit application files.
@@ -22,6 +26,7 @@ The app is live and hosted on the Streamlit Community Cloud: [visa-demo.streamli
   - `lucas_organic_carbon/` Directory containing data files for the Lucas Organic Carbon dataset.
     - `target/` Directory containing target data files.
     - `training_test/` Directory containing training and test data files.
+  - `test_app.py` Unit tests for checking the app.
 - ```check_env.py``` Script to check if the required environment and packages are installed.
 - ```environment.yml``` Conda environment configuration file listing the dependencies.
 - ```local-install-instructions.md``` Instructions for setting up the project locally.
@@ -115,3 +120,4 @@ The app is live and hosted on the Streamlit Community Cloud: [visa-demo.streamli
 | I1 | Data Exploration Graphs | Bar chart for distribution of organic carbon concentration classes, spectral profiles of random soil samples, boxplot of selected wavelengths by carbon concentration class. | done | Noel Kronenberg | M6 |
 | I2 | Model Download | Option to download trained model as a pickle file. | done | Noel Kronenberg | M6 |
 | I3 | Demo Datasets | Option to choose from multiple demo datasets. | done | Noel Kronenberg | M6 |
+| I4 | Unit Tests | Unit tests to check the app with automation for commits. | done | Noel Kronenberg | M6 |
