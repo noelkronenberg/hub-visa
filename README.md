@@ -10,6 +10,8 @@ The app is live and hosted on the Streamlit Community Cloud: [visa-demo.streamli
 
 ## Structure
 
+- ```.github/workflows/``` Directory containing GitHub Actions configurations.
+-   - `tests.yml` Configuration for running unit tests on commit.
 - ```.streamlit/``` Directory containing Streamlit configurations.
   - `config.toml` Configuration file for Streamlit server settings.
 - ```app/``` Directory containing Streamlit application files.
@@ -24,6 +26,7 @@ The app is live and hosted on the Streamlit Community Cloud: [visa-demo.streamli
   - `lucas_organic_carbon/` Directory containing data files for the Lucas Organic Carbon dataset.
     - `target/` Directory containing target data files.
     - `training_test/` Directory containing training and test data files.
+  - `test_app.py` Unit tests for checking the app.
 - ```check_env.py``` Script to check if the required environment and packages are installed.
 - ```environment.yml``` Conda environment configuration file listing the dependencies.
 - ```local-install-instructions.md``` Instructions for setting up the project locally.
