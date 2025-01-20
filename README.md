@@ -2,6 +2,8 @@
 
 Visual analytics app for exploring machine learning classifications.
 
+[![Unit Tests](https://github.com/noelkronenberg/hub-visa/actions/workflows/tests.yml/badge.svg)](https://github.com/noelkronenberg/hub-visa/actions/workflows/tests.yml)
+
 ## Showcase
 
 The app is live and hosted on the Streamlit Community Cloud: [visa-demo.streamlit.app](https://visa-demo.streamlit.app/)
