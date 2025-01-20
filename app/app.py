@@ -181,7 +181,25 @@ with st.sidebar.expander("**Model**", expanded=True):
                 X_train, st.session_state.X_test, y_train, st.session_state.y_test, st.session_state.label_encoder \
                     = prepare_data(df_combined, data_percentage)
                 logging.info("Data prepared successfully.")
+                
+                if 'y_test' not in st.session_state:
+                    st.session_state.y_test = None
 
+                if 'X_train' not in st.session_state:
+                    st.session_state.X_train = None
+
+                if 'X_test' not in st.session_state:
+                    st.session_state.X_test = None
+
+                if 'y_train' not in st.session_state:
+                    st.session_state.y_train = None
+
+                if all(v is not None for v in [X_train, X_test, y_train, y_test]):
+                    st.session_state.X_train = X_train
+                    st.session_state.X_test = X_test
+                    st.session_state.y_train = y_train
+                    st.session_state.y_test = y_test
+                    
         # spinner while training model
         with st.spinner('Training the model...'):
 
