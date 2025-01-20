@@ -117,3 +117,4 @@ The app is live and hosted on the Streamlit Community Cloud: [visa-demo.streamli
 | I1 | Data Exploration Graphs | Bar chart for distribution of organic carbon concentration classes, spectral profiles of random soil samples, boxplot of selected wavelengths by carbon concentration class. | done | Noel Kronenberg | M6 |
 | I2 | Model Download | Option to download trained model as a pickle file. | done | Noel Kronenberg | M6 |
 | I3 | Demo Datasets | Option to choose from multiple demo datasets. | done | Noel Kronenberg | M6 |
+| I4 | Unit Tests | Unit tests to check the app with automation for commits. | done | Noel Kronenberg | M6 |
