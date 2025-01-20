@@ -15,13 +15,14 @@ The app is live and hosted on the Streamlit Community Cloud: [visa-demo.streamli
 - ```.streamlit/``` Directory containing Streamlit configurations.
   - `config.toml` Configuration file for Streamlit server settings.
 - ```app/``` Directory containing Streamlit application files.
+  - `services/` Directory containing supporting files.
+    - `data.py` Contains functions for loading and preparing data.
+    - `error_analysis.py` Contains functions for visualizing error analysis.
+    - `feature_importance.py` Contains functions for visualizing feature importance.
+    - `model.py` Contains functions for training and evaluating the machine learning model.
   - `__init__.py` Initialization file for the app module.
   - `app.py` Main application file for the Streamlit dashboard.
   - `config.py` Configuration file for general settings used in the app.
-  - `data.py` Contains functions for loading and preparing data.
-  - `error_analysis.py` Contains functions for visualizing error analysis.
-  - `feature_importance.py` Contains functions for visualizing feature importance.
-  - `model.py` Contains functions for training and evaluating the machine learning model.
   - `requirements.txt` Lists the Python packages required to run the app.
   - `lucas_organic_carbon/` Directory containing data files for the Lucas Organic Carbon dataset.
     - `target/` Directory containing target data files.
