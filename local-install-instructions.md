@@ -1,7 +1,6 @@
 # Local install instructions
 
-The course uses Python 3 and some data analysis packages such as numpy, pandas,
-scikit-learn, and matplotlib.
+The project uses Python 3 and some data analysis packages.
 
 ## Install Miniconda
 
@@ -31,12 +30,12 @@ this repository:
 
 ```sh
 # Activate your conda environment
-conda activate hackathon_parallel_computing
+conda activate semester_project_group_a
 python check_env.py
 ```
 
 Make sure that there is no `FAIL` in the output when running the `check_env.py`
-script, i.e. that its output looks similar to this:
+script.
 
 ## Open web app
 

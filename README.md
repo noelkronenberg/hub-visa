@@ -8,8 +8,23 @@ The app is live and hosted on the Streamlit Community Cloud: [visa-demo.streamli
 
 ## Structure
 
-- ```.streamlit``` Streamlit configuration (e.g. server settings) 
-- ```app``` Streamlit-based application
+- ```.streamlit/``` Directory containing Streamlit configurations.
+  - `config.toml` Configuration file for Streamlit server settings.
+- ```app/``` Directory containing Streamlit application files.
+  - `__init__.py` Initialization file for the app module.
+  - `app.py` Main application file for the Streamlit dashboard.
+  - `config.py` Configuration file for general settings used in the app.
+  - `data.py` Contains functions for loading and preparing data.
+  - `error_analysis.py` Contains functions for visualizing error analysis.
+  - `feature_importance.py` Contains functions for visualizing feature importance.
+  - `model.py` Contains functions for training and evaluating the machine learning model.
+  - `requirements.txt` Lists the Python packages required to run the app.
+  - `lucas_organic_carbon/` Directory containing data files for the Lucas Organic Carbon dataset.
+    - `target/` Directory containing target data files.
+    - `training_test/` Directory containing training and test data files.
+- ```check_env.py``` Script to check if the required environment and packages are installed.
+- ```environment.yml``` Conda environment configuration file listing the dependencies.
+- ```local-install-instructions.md``` Instructions for setting up the project locally.
 
 ## Milestones
 
@@ -37,11 +52,11 @@ The app is live and hosted on the Streamlit Community Cloud: [visa-demo.streamli
 | C5  | Dynamic Model Training        | Allow user to change model parameters to retrain the model dynamically.                                         | done   | M4        |
 | C6  | Faster UX                     | Enable faster loading times and improve usability.                                                              | done   | M4        |
 | C7  | Class Selection               | Allow users to select a specific target class to view evaluation metrics.                                       | done   | M4        |
-| C8  | Overview of Importance Scores | Show importance scores for each feature as bar chart.                                                           | open   | M6        |
+| C8  | Overview of Importance Scores | Show importance scores for each feature as bar chart.                                                           | done   | M6        |
 | C9  | Impact of Intervals           | Show the average impact of intervals as beeswarm.                                                               | open   | M6        |
 | C10 | Impact of 2-D Intervals       | Show the average impact of 2-D intervals as heatmap.                                                            | open   | M6        |
 | C11 | Interval Settings             | Allow the user to change settings for intervals (e.g. number of intervals).                                     | open   | M6        |
-| C12 | Improved Division of Tasks    | Allow the user to focus on a single task (e.g. model training, error exploration, investigation of importance). | open   | M6        |
+| C12 | Improved Division of Tasks    | Allow the user to focus on a single task (e.g. model training, error exploration, investigation of importance). | done   | M6        |
 
 
 ## Activities
@@ -99,3 +114,4 @@ The app is live and hosted on the Streamlit Community Cloud: [visa-demo.streamli
 |----|-------------|--------------|--------|--------------|-----------|
 | I1 | Data Exploration Graphs | Bar chart for distribution of organic carbon concentration classes, spectral profiles of random soil samples, boxplot of selected wavelengths by carbon concentration class. | done | Noel Kronenberg | M6 |
 | I2 | Model Download | Option to download trained model as a pickle file. | done | Noel Kronenberg | M6 |
+| I3 | Demo Datasets | Option to choose from multiple demo datasets. | done | Noel Kronenberg | M6 |

@@ -45,7 +45,7 @@ def visualize_feature_importance(model):
     with st.expander("**Feature Importance**", expanded=True):
 
         # allow user to select range of values to show
-        num_features = st.slider('Number of Features', min_value=1, max_value=len(sorted_feature_importance), value=20)
+        num_features = st.slider('Number of Features', min_value=1, max_value=len(sorted_feature_importance), value=max(1, len(sorted_feature_importance) // 3))
         sorted_feature_importance = sorted_feature_importance.head(num_features)
         logging.info(f"Top {num_features} feature importance displayed successfully.")
 
