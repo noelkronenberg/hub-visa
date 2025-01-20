@@ -4,11 +4,11 @@ from sklearn.metrics import accuracy_score
 import logging
 import pickle
 
-from error_analysis import visualize_error_analysis
-from feature_importance import visualize_feature_importance
+from services.error_analysis import visualize_error_analysis
+from services.feature_importance import visualize_feature_importance
 
-from data import demo_cases, preset_target, preset_training, load_data, prepare_data, plot_target_distribution, plot_feature_profiles, plot_feature_distribution
-from model import train_model, evaluate_model
+from services.data import demo_cases, preset_target, preset_training, load_data, prepare_data, plot_target_distribution, plot_feature_profiles, plot_feature_distribution
+from services.model import train_model, evaluate_model
 
 # configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
