@@ -173,7 +173,7 @@ def visualize_interval_importance(model, X_test, y_test, feature_index=0, num_in
     # define intervals
     intervals = _define_intervals(X_test, feature_index, num_intervals)
 
-    # Check if all differences are zero
+    # check if all differences are zero
     if np.all(accuracy_diffs == 0):
         st.warning("The differences in error metrics are too small to display meaningful charts. Try a different feature or larger dataset.")
         logging.warning("The differences in error metrics are too small to display meaningful charts. Try a different feature or larger dataset.")
