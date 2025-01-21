@@ -104,7 +104,7 @@ The app is live and hosted on the Streamlit Community Cloud: [visa-demo.streamli
 | A1  |                               | Calculating importance scores.                                              | done   | Aodi Chen, Noel Kronenberg |
 | A2  |                               | Adding bar chart to plot feature importance.                                | done   | Aodi Chen, Noel Kronenberg |
 | A3  |                               | Adding slider to select number of features.                                 | done   | Noel Kronenberg            |
-| C9  | Impact of Intervals           |                                                                             |        | Fabian Henning             |
+| C9  | Impact of Intervals           | Assess impact of feature value intervals on the prediction accuracy by splitting a feature into intervals and mapping every data point to the boundaries of that interval. By comparing evaluation metrics of original data to the one with a transformed interval of our choice, we derive the importance of that interval to the prediction.                                                                        |        | Fabian Henning             |
 | A1  |                               | Slicing data into desired intervals.                                        | done   | Fabian Henning             |
 | A2  |                               | Comparing prediction metrics of transformed and original data.              | done   | Fabian Henning, Noel Kronenberg |
 | A3  |                               | Plotting differences of prediction metrics.                                 | done   | Noel Kronenberg            |
