@@ -44,6 +44,7 @@ The app is live and hosted on the Streamlit Community Cloud: [visa-demo.streamli
 | M4 | Explorative Error Analysis Prototype (*Komponente I*) | [see *Components*] ||
 |M5|Feature Importance Concept (*Konzept II*)|[[presentation slides](https://docs.google.com/presentation/d/1sSXYiWVSzP-jKvBnRYrvyK_wPkAHrHsJ0h6WnJ6E7G0/edit?usp=sharing)]||
 |M6|Feature Importance Prototype (*Komponente II*)|[see *Components*]|[see *Improvements*]|
+|M7|Model Comparison Concept (*Konzept III*)|[[presentation slides](https://docs.google.com/presentation/d/1NYDmAEd8p7cuZHK_mLCI6-d52McKKU-4vzNwit14Toc/edit?usp=sharing)]||
 
 ## Components
 
