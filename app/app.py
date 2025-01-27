@@ -5,7 +5,7 @@ import logging
 import pickle
 
 from services.error_analysis import visualize_error_analysis
-from services.feature_importance import visualize_feature_importance, visualize_interval_importance
+from services.feature_importance import visualize_feature_importance, visualize_interval_importance, visualize_joint_importance, get_feature_selection_inputs
 from services.data import demo_cases, preset_target, preset_training, load_data, prepare_data, plot_target_distribution, plot_feature_profiles, plot_feature_distribution
 from services.model import train_model, evaluate_model
 
@@ -336,10 +336,6 @@ with tab3:
 
         with st.expander("**Interval Importance**", expanded=True):
 
-            st.write("""
-                Assess impact of feature value intervals on the prediction accuracy by splitting a feature into intervals and mapping every data point to the boundaries of that interval. By comparing evaluation metrics of original data to the one with a transformed interval of our choice, we derive the importance of that interval to the prediction.
-            """)
-
             # get feature importances
             importances = st.session_state.rf_classifier.feature_importances_
             feature_names = st.session_state.X_test.columns
@@ -374,4 +370,30 @@ with tab3:
                 st.session_state.y_test, 
                 feature_index, 
                 num_intervals
+            )
+
+        # joint interval importance
+        with st.expander("**Joint Interval Importance**", expanded=True):
+
+            # get feature importance values
+            importances = st.session_state.rf_classifier.feature_importances_
+            feature_names = st.session_state.X_test.columns
+            feature_importance_df = pd.DataFrame({
+                'feature': feature_names,
+                'importance': importances
+            }).sort_values(by='importance', ascending=False)
+
+            # get feature selection inputs from user
+            selected_feature1, selected_feature2, feature1_index, feature2_index, num_intervals1, num_intervals2 = \
+                get_feature_selection_inputs(feature_importance_df, feature_names)
+
+            # visualize joint importance
+            visualize_joint_importance(
+                st.session_state.rf_classifier,
+                st.session_state.X_test,
+                st.session_state.y_test,
+                feature1_index,
+                feature2_index,
+                num_intervals1,
+                num_intervals2
             )
