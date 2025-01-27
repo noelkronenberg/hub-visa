@@ -392,6 +392,8 @@ def visualize_joint_importance(model, X_test, y_test, feature_1_index, feature_2
         st.warning("The differences in error metrics are too small to display meaningful charts. Try a different feature or larger dataset.")
     else: 
 
+        st.write("") # add space between elements
+
         # create heatmap for each selected metric
         for metric_name in selected_metrics:
             metric_values = metrics[metric_name]
