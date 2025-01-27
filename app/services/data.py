@@ -8,7 +8,7 @@ from sklearn.datasets import load_iris, load_wine, load_breast_cancer
 
 # demo cases
 demo_cases = {
-    'Lucas Organic Carbon': {
+    'Lucas Organic Carbon (PCA)': {
         'target': 'app/lucas_organic_carbon/target/lucas_organic_carbon_target.csv',
         'training': 'app/lucas_organic_carbon/training_test/compressed_data.csv'
     },
@@ -26,12 +26,12 @@ demo_cases = {
     }
 }
 
-preset_target = demo_cases['Lucas Organic Carbon']['target']
-preset_training = demo_cases['Lucas Organic Carbon']['training']
+preset_target = demo_cases['Lucas Organic Carbon (PCA)']['target']
+preset_training = demo_cases['Lucas Organic Carbon (PCA)']['training']
 
 # load data
 @st.cache_data(show_spinner=False)
-def load_data(load_preset_target, load_preset_training, target_data=None, training_data=None, selected_demo_case='Lucas Organic Carbon'):
+def load_data(load_preset_target, load_preset_training, target_data=None, training_data=None, selected_demo_case='Lucas Organic Carbon (PCA)'):
     """
     Load the data for training.
     
