@@ -380,7 +380,7 @@ with tab3:
         # joint interval importance
         with st.expander("**Joint Interval Importance**", expanded=True):
 
-             st.write("""
+            st.write("""
                 Assess the impact of feature value intervals on the prediction accuracy by splitting features into intervals and mapping every data point to the boundaries of the intervals. By comparing evaluation metrics of original data to the ones with transformed intervals of our choice, we derive the importance of the intervals to the prediction.
             """)
 
