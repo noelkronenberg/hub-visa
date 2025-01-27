@@ -61,7 +61,7 @@ The app is live and hosted on the Streamlit Community Cloud: [visa-demo.streamli
 | C7  | Class Selection               | Allow users to select a specific target class to view evaluation metrics.                                       | done   | M4        |
 | C8  | Overview of Importance Scores | Show importance scores for each feature.                                                                        | done   | M6        |
 | C9  | Impact of Intervals           | Show the average impact of intervals.                                                                           | done   | M6        |
-| C10 | Impact of 2-D Intervals       | Show the average impact of 2-D intervals.                                                                       | open   | M6        |
+| C10 | Impact of 2-D Intervals       | Show the average impact of 2-D intervals.                                                                       | done   | M6        |
 | C11 | Improved Division of Tasks    | Allow the user to focus on a single task (e.g. model training, error exploration, investigation of importance). | done   | M6        |
 
 
@@ -111,6 +111,9 @@ The app is live and hosted on the Streamlit Community Cloud: [visa-demo.streamli
 | A3  |                               | Plotting differences of prediction metrics.                                 | done   | Noel Kronenberg            |
 | A4  |                               | Adding dropdown and slider for user input (feature selection, number of intervals). | done   | Noel Kronenberg            |
 | C10 | Impact of 2-D Intervals       |                                                                             |        | Aodi Chen                  |
+| A1  |                               | Expanding functions from C9 to allow for 2-D intervals.                     | done   | Aodi Chen                  |
+| A2  |                               | Visualizing 2-D intervals for all metrics.                                   | done   | Aodi Chen, Noel Kronenberg |
+| A3  |                               | Adding dropdown and slider for user input (selection of features, number of intervals, selection of metrics). | done   | Aodi Chen, Noel Kronenberg |
 | C11 | Improved Division of Tasks    |                                                                             |        | Noel Kronenberg            |
 | A1  |                               | Adding of tabs for Explorative Error Analysis and Feature Importance.       | done   | Noel Kronenberg            |
 | A2  |                               | Refactoring (e.g. encapsulating) the code to be more readable.              | done   | Noel Kronenberg            |
