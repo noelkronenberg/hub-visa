@@ -174,6 +174,7 @@ with st.sidebar.expander("**Model**", expanded=True):
 
             if df_combined is None:
                 logging.error("Data loading failed. Please adjust data settings.")
+                st.error("Data loading failed. Please adjust data settings.")
             else:
                 logging.info("Data loaded successfully.")
 
@@ -212,17 +213,17 @@ with st.sidebar.expander("**Model**", expanded=True):
                 st.session_state.y_pred = st.session_state.rf_classifier.predict(st.session_state.X_test)
                 logging.info("Model trained successfully.")
 
-            # spinner while evaluating
-            with st.spinner('Evaluating the model...'):
-                st.session_state.accuracy, st.session_state.precision, st.session_state.recall, \
-                    st.session_state.f1, st.session_state.unique_labels, st.session_state.cm = evaluate_model(
-                        st.session_state.y_test, 
-                        st.session_state.y_pred, 
-                        st.session_state.label_encoder, 
-                        st.session_state.normalize_cm
-                    )
-            
-            st.session_state.first_run = False
+                # spinner while evaluating
+                with st.spinner('Evaluating the model...'):
+                    st.session_state.accuracy, st.session_state.precision, st.session_state.recall, \
+                        st.session_state.f1, st.session_state.unique_labels, st.session_state.cm = evaluate_model(
+                            st.session_state.y_test, 
+                            st.session_state.y_pred, 
+                            st.session_state.label_encoder, 
+                            st.session_state.normalize_cm
+                        )
+                
+                st.session_state.first_run = False
 
     # download model button
     if 'rf_classifier' in st.session_state:
