@@ -443,6 +443,15 @@ def visualize_joint_importance(model, X_test, y_test, feature_1_index, feature_2
                 margin=dict(l=20, r=20, t=20, b=20)
             )
 
+            # add a rectangle shape to create a border effect
+            fig.add_shape(
+                type="rect",
+                x0=-0.5, x1=num_intervals1 - 0.5,
+                y0=-0.5, y1=num_intervals2 - 0.5,
+                line=dict(color="black", width=1),
+                fillcolor='rgba(0,0,0,0)'
+            )
+
             # add grid lines
             for i in range(num_intervals1 + 1):
                 fig.add_shape(
