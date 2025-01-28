@@ -6,7 +6,7 @@ import plotly.graph_objects as go
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
 from services.model import evaluate_model
-from config import RED, BLUE
+from config import BLUE
 
 def _get_feature_importance(model):
     """
@@ -56,7 +56,7 @@ def visualize_feature_importance(model):
         fig = go.Figure(data=go.Bar(
             x=sorted_feature_importance['rank'],
             y=sorted_feature_importance['importance'],
-            marker_color=RED,
+            marker_color=BLUE,
             textposition='auto',
             hovertemplate='Rank: %{x}<br>Feature: %{customdata}<br>Importance: %{y:.4f}<extra></extra>',
             customdata=sorted_feature_importance['feature']
@@ -136,10 +136,10 @@ def _interval_importance(model, X_test, y_test, feature_index=0, num_intervals=1
         accuracy_transformed, precision_transformed, recall_transformed, f1_transformed = evaluate_model(y_test_transformed, y_pred_transformed)
         
         # calculate the differences in error metrics
-        accuracy_diff = accuracy - accuracy_transformed
-        precision_diff = precision - precision_transformed
-        recall_diff = recall - recall_transformed
-        f1_diff = f1 - f1_transformed
+        accuracy_diff = abs(accuracy - accuracy_transformed)
+        precision_diff = abs(precision - precision_transformed)
+        recall_diff = abs(recall - recall_transformed)
+        f1_diff = abs(f1 - f1_transformed)
         
         # append the differences to the lists
         accuracy_diffs.append(accuracy_diff)
@@ -221,7 +221,7 @@ def visualize_interval_importance(model, X_test, y_test, feature_index=0, num_in
     fig = go.Figure(data=go.Bar(
         x=intervals[1:],
         y=accuracy_diffs,
-        marker_color=RED,
+        marker_color=BLUE,
         textposition='auto',
         hovertemplate='Interval: %{x}<br>Accuracy Difference: %{y:.4f}<extra></extra>'
     ))
@@ -408,9 +408,6 @@ def visualize_joint_importance(model, X_test, y_test, feature_1_index, feature_2
             
             # ensure all values are greater than zero
             metric_values = np.maximum(metric_values, 1e-10)
-
-            min_value = np.min(metric_values)
-            max_value = np.max(metric_values)
             
             # create heatmap
             fig = go.Figure(data=go.Heatmap(
@@ -418,8 +415,8 @@ def visualize_joint_importance(model, X_test, y_test, feature_1_index, feature_2
                 x=x_labels,
                 y=y_labels,
                 colorscale=[[0, 'white'], [1, BLUE]], # TODO: check whether values can be outside of this
-                zmin=min_value,
-                zmax=max_value,
+                zmin=0,
+                zmax=np.max(metric_values),
                 hovertemplate=(
                     f"{feature1_name}: %{{x}}<br>" +
                     f"{feature2_name}: %{{y}}<br>" +
