@@ -150,6 +150,27 @@ def _display_confusion_matrix(cm, unique_labels, selected_class_index):
         fillcolor='rgba(0,0,0,0)'
     )
 
+     # add grid lines
+    for i in range(len(unique_labels) + 1):
+        fig.add_shape(
+            type='line',
+            x0=i - 0.5,
+            x1=i - 0.5,
+            y0=-0.5,
+            y1=len(unique_labels) - 0.5,
+            line=dict(color='white', width=1)
+    )
+    
+    for i in range(len(unique_labels) + 1):
+        fig.add_shape(
+            type='line',
+            x0=-0.5,
+            x1=len(unique_labels) - 0.5,
+            y0=i - 0.5,
+            y1=i - 0.5,
+            line=dict(color='white', width=1)
+    )
+
     # add rectangles to highlight the selected class (row and column)
     fig.add_shape(
         type="rect",

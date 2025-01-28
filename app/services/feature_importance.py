@@ -6,7 +6,7 @@ import plotly.graph_objects as go
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
 from services.model import evaluate_model
-from config import RED, BLUE
+from config import BLUE
 
 def _get_feature_importance(model):
     """
@@ -56,7 +56,7 @@ def visualize_feature_importance(model):
         fig = go.Figure(data=go.Bar(
             x=sorted_feature_importance['rank'],
             y=sorted_feature_importance['importance'],
-            marker_color=RED,
+            marker_color=BLUE,
             textposition='auto',
             hovertemplate='Rank: %{x}<br>Feature: %{customdata}<br>Importance: %{y:.4f}<extra></extra>',
             customdata=sorted_feature_importance['feature']
@@ -136,10 +136,10 @@ def _interval_importance(model, X_test, y_test, feature_index=0, num_intervals=1
         accuracy_transformed, precision_transformed, recall_transformed, f1_transformed = evaluate_model(y_test_transformed, y_pred_transformed)
         
         # calculate the differences in error metrics
-        accuracy_diff = accuracy - accuracy_transformed
-        precision_diff = precision - precision_transformed
-        recall_diff = recall - recall_transformed
-        f1_diff = f1 - f1_transformed
+        accuracy_diff = abs(accuracy - accuracy_transformed)
+        precision_diff = abs(precision - precision_transformed)
+        recall_diff = abs(recall - recall_transformed)
+        f1_diff = abs(f1 - f1_transformed)
         
         # append the differences to the lists
         accuracy_diffs.append(accuracy_diff)
@@ -221,7 +221,7 @@ def visualize_interval_importance(model, X_test, y_test, feature_index=0, num_in
     fig = go.Figure(data=go.Bar(
         x=intervals[1:],
         y=accuracy_diffs,
-        marker_color=RED,
+        marker_color=BLUE,
         textposition='auto',
         hovertemplate='Interval: %{x}<br>Accuracy Difference: %{y:.4f}<extra></extra>'
     ))
@@ -270,12 +270,12 @@ def get_feature_selection_inputs(feature_importance_df, feature_names):
         )
         feature2_index = list(feature_names).index(selected_feature2)
         
-    # mumber of intervals for features
+    # number of intervals for features
     num_intervals = st.slider(
         f'Number of Intervals', 
         min_value=1, 
         max_value=20, 
-        value=3,
+        value=10,
         key='joint_importance_intervals'
     )
     
@@ -284,90 +284,97 @@ def get_feature_selection_inputs(feature_importance_df, feature_names):
 def _joint_interval_importance(model, X_test, y_test, feature_1_index, feature_2_index,
                              num_intervals1, num_intervals2):
     """
-    Calculate importance for different intervals of two features.
+    calculate importance for different intervals of two features.
     """
 
-    # create result matrices
-    accuracy_diffs = np.zeros((num_intervals1, num_intervals2))
-    precision_diffs = np.zeros((num_intervals1, num_intervals2))
-    recall_diffs = np.zeros((num_intervals1, num_intervals2))
-    f1_diffs = np.zeros((num_intervals1, num_intervals2))
+    # get feature values
+    feature1_values = X_test.iloc[:, feature_1_index].values
+    feature2_values = X_test.iloc[:, feature_2_index].values
     
     # get baseline predictions and metrics
     base_pred = model.predict(X_test)
     base_metrics = {
         'accuracy': accuracy_score(y_test, base_pred),
-        'precision': precision_score(y_test, base_pred, average='weighted'),
-        'recall': recall_score(y_test, base_pred, average='weighted'),
-        'f1': f1_score(y_test, base_pred, average='weighted')
+        'precision': precision_score(y_test, base_pred, average='weighted', zero_division=0),
+        'recall': recall_score(y_test, base_pred, average='weighted', zero_division=0),
+        'f1': f1_score(y_test, base_pred, average='weighted', zero_division=0)
     }
     
-    # get feature value ranges
-    feature1_values = X_test.iloc[:, feature_1_index]
-    feature2_values = X_test.iloc[:, feature_2_index]
+    # create evenly distributed intervals
+    feature1_min, feature1_max = np.min(feature1_values), np.max(feature1_values)
+    feature2_min, feature2_max = np.min(feature2_values), np.max(feature2_values)
     
-    # create intervals
-    intervals_1 = np.percentile(feature1_values, np.linspace(0, 100, num_intervals1 + 1))
-    intervals_2 = np.percentile(feature2_values, np.linspace(0, 100, num_intervals2 + 1))
+    # add a small offset to ensure all data points are included
+    epsilon = 1e-10
+    feature1_min -= epsilon
+    feature1_max += epsilon
+    feature2_min -= epsilon
+    feature2_max += epsilon
     
-    # evaluate each interval combination
-    for i in range(num_intervals1):
-        for j in range(num_intervals2):
+    intervals_1 = np.linspace(feature1_min, feature1_max, num_intervals1 + 1)
+    intervals_2 = np.linspace(feature2_min, feature2_max, num_intervals2 + 1)
+    
+    # create result matrices
+    accuracy_diffs = np.zeros((num_intervals2, num_intervals1))
+    precision_diffs = np.zeros((num_intervals2, num_intervals1))
+    recall_diffs = np.zeros((num_intervals2, num_intervals1))
+    f1_diffs = np.zeros((num_intervals2, num_intervals1))
+    
+    # calculate importance for each interval combination
+    for i in range(num_intervals2):
+        for j in range(num_intervals1):
             X_modified = X_test.copy()
+        
+            value1 = (intervals_1[j] + intervals_1[j + 1]) / 2
+            value2 = (intervals_2[i] + intervals_2[i + 1]) / 2
+       
+            X_modified.iloc[:, feature_1_index] = value1
+            X_modified.iloc[:, feature_2_index] = value2
             
-            # get data points in current interval
-            mask = (
-                (feature1_values >= intervals_1[i]) & 
-                (feature1_values < intervals_1[i + 1]) &
-                (feature2_values >= intervals_2[j]) & 
-                (feature2_values < intervals_2[j + 1])
-            )
+            # get modified predictions and metrics
+            modified_pred = model.predict(X_modified)
+            modified_metrics = {
+                'accuracy': accuracy_score(y_test, modified_pred),
+                'precision': precision_score(y_test, modified_pred, average='weighted', zero_division=0),
+                'recall': recall_score(y_test, modified_pred, average='weighted', zero_division=0),
+                'f1': f1_score(y_test, modified_pred, average='weighted', zero_division=0)
+            }
             
-            if mask.any():
-                mid_value1 = (intervals_1[i] + intervals_1[i + 1]) / 2
-                mid_value2 = (intervals_2[j] + intervals_2[j + 1]) / 2
-
-                X_modified.iloc[mask, feature_1_index] = mid_value1
-                X_modified.iloc[mask, feature_2_index] = mid_value2
-                
-                # get modified predictions and metrics
-                modified_pred = model.predict(X_modified)
-                modified_metrics = {
-                    'accuracy': accuracy_score(y_test, modified_pred),
-                    'precision': precision_score(y_test, modified_pred, average='weighted'),
-                    'recall': recall_score(y_test, modified_pred, average='weighted'),
-                    'f1': f1_score(y_test, modified_pred, average='weighted')
-                }
-                
-                # calculate metric differences
-                accuracy_diffs[i, j] = abs(modified_metrics['accuracy'] - base_metrics['accuracy'])
-                precision_diffs[i, j] = abs(modified_metrics['precision'] - base_metrics['precision'])
-                recall_diffs[i, j] = abs(modified_metrics['recall'] - base_metrics['recall'])
-                f1_diffs[i, j] = abs(modified_metrics['f1'] - base_metrics['f1'])
+            # calculate differences and ensure no zero values
+            accuracy_diffs[i, j] = max(abs(modified_metrics['accuracy'] - base_metrics['accuracy']), 1e-10)
+            precision_diffs[i, j] = max(abs(modified_metrics['precision'] - base_metrics['precision']), 1e-10)
+            recall_diffs[i, j] = max(abs(modified_metrics['recall'] - base_metrics['recall']), 1e-10)
+            f1_diffs[i, j] = max(abs(modified_metrics['f1'] - base_metrics['f1']), 1e-10)
+    
+    # ensure no zero values in matrices
+    accuracy_diffs[accuracy_diffs < 1e-10] = 1e-10
+    precision_diffs[precision_diffs < 1e-10] = 1e-10
+    recall_diffs[recall_diffs < 1e-10] = 1e-10
+    f1_diffs[f1_diffs < 1e-10] = 1e-10
     
     return accuracy_diffs, precision_diffs, recall_diffs, f1_diffs, intervals_1, intervals_2
 
 def visualize_joint_importance(model, X_test, y_test, feature_1_index, feature_2_index,
                              num_intervals1, num_intervals2):
     """
-    Visualize the joint importance of two features using heatmaps for different metrics.
+    visualize the joint importance of two features using heatmaps for different metrics.
     """
-
-    # get difference matrices
-    accuracy_diffs, precision_diffs, recall_diffs, f1_diffs, intervals_1, intervals_2 = _joint_interval_importance(
-        model, X_test, y_test, feature_1_index, feature_2_index,
-        num_intervals1, num_intervals2
-    )
 
     # get feature names
     feature_names = list(model.feature_names_in_)
     feature1_name = feature_names[feature_1_index]
     feature2_name = feature_names[feature_2_index]
-
+    
+    # get difference matrices
+    accuracy_diffs, precision_diffs, recall_diffs, f1_diffs, intervals_1, intervals_2 = _joint_interval_importance(
+        model, X_test, y_test, feature_1_index, feature_2_index,
+        num_intervals1, num_intervals2
+    )
+    
     # create interval labels
-    x_labels = [f'{intervals_1[i]:.2f}-{intervals_1[i+1]:.2f}' for i in range(len(intervals_1)-1)]
-    y_labels = [f'{intervals_2[i]:.2f}-{intervals_2[i+1]:.2f}' for i in range(len(intervals_2)-1)]
-
+    x_labels = [f'{intervals_1[i]:.4f}-{intervals_1[i+1]:.4f}' for i in range(len(intervals_1)-1)]
+    y_labels = [f'{intervals_2[i]:.4f}-{intervals_2[i+1]:.4f}' for i in range(len(intervals_2)-1)]
+    
     # create metrics dictionary
     metrics = {
         'Accuracy': accuracy_diffs,
@@ -375,7 +382,7 @@ def visualize_joint_importance(model, X_test, y_test, feature_1_index, feature_2
         'Recall': recall_diffs,
         'F1 Score': f1_diffs
     }
-
+    
     # add metric selection
     selected_metrics = st.multiselect(
         'Select Metrics to Display',
@@ -383,10 +390,11 @@ def visualize_joint_importance(model, X_test, y_test, feature_1_index, feature_2
         default=['Accuracy'],
         key='joint_importance_metrics'
     )
-
+    
     if not selected_metrics:
         st.warning('Please select at least one metric to display')
-        
+        return
+    
     # if matrix contains only 0, warn user (for any metric)
     if all(np.all(metric_values == 0) for metric_values in metrics.values()):
         st.warning("The differences in error metrics are too small to display meaningful charts. Try a different feature or larger dataset.")
@@ -397,33 +405,72 @@ def visualize_joint_importance(model, X_test, y_test, feature_1_index, feature_2
         # create heatmap for each selected metric
         for metric_name in selected_metrics:
             metric_values = metrics[metric_name]
-
-            min_value = np.min(metric_values)
-            max_value = np.max(metric_values)
+            
+            # ensure all values are greater than zero
+            metric_values = np.maximum(metric_values, 1e-10)
             
             # create heatmap
             fig = go.Figure(data=go.Heatmap(
-            z=metric_values,
-            x=x_labels,
-            y=y_labels,
-            colorscale=[[0, 'white'], [1, BLUE]],
-            zmin=min_value,
-            zmax=max_value,
-            hovertemplate=(
-                f"{feature1_name}: %{{x}}<br>" +
-                f"{feature2_name}: %{{y}}<br>" +
-                f"{metric_name} Difference: %{{z:.3f}}<extra></extra>"
-            )
+                z=metric_values,
+                x=x_labels,
+                y=y_labels,
+                colorscale=[[0, 'white'], [1, BLUE]], # TODO: check whether values can be outside of this
+                zmin=0,
+                zmax=np.max(metric_values),
+                hovertemplate=(
+                    f"{feature1_name}: %{{x}}<br>" +
+                    f"{feature2_name}: %{{y}}<br>" +
+                    f"{metric_name} Difference: %{{z:.4f}}<extra></extra>"
+                )
             ))
-
+            
             # update layout
             fig.update_layout(
-            title={
-                'text': f'{metric_name}',
-            },
-            xaxis_title=f'Feature: {feature1_name}',
-            yaxis_title=f'Feature: {feature2_name}',
-            margin=dict(l=20, r=20, t=20, b=20)
+                title={'text': f'{metric_name}'},
+                xaxis_title=f'Feature: {feature1_name}',
+                yaxis_title=f'Feature: {feature2_name}',
+                xaxis={
+                    'side': 'bottom',
+                    'tickangle': 45,
+                    'showgrid': False,
+                    'range': [-0.5, num_intervals1 - 0.5]
+                },
+                yaxis={
+                    'autorange': 'reversed',
+                    'showgrid': False,
+                    'range': [-0.5, num_intervals2 - 0.5]
+                },
+                margin=dict(l=20, r=20, t=20, b=20)
             )
 
+            # add a rectangle shape to create a border effect
+            fig.add_shape(
+                type="rect",
+                x0=-0.5, x1=num_intervals1 - 0.5,
+                y0=-0.5, y1=num_intervals2 - 0.5,
+                line=dict(color="black", width=1),
+                fillcolor='rgba(0,0,0,0)'
+            )
+
+            # add grid lines
+            for i in range(num_intervals1 + 1):
+                fig.add_shape(
+                    type='line',
+                    x0=i - 0.5,
+                    x1=i - 0.5,
+                    y0=-0.5,
+                    y1=num_intervals2 - 0.5,
+                    line=dict(color='white', width=1)
+            )
+            
+            for i in range(num_intervals2 + 1):
+                fig.add_shape(
+                    type='line',
+                    x0=-0.5,
+                    x1=num_intervals1 - 0.5,
+                    y0=i - 0.5,
+                    y1=i - 0.5,
+                    line=dict(color='white', width=1)
+            )
+            
             st.plotly_chart(fig, use_container_width=True)
