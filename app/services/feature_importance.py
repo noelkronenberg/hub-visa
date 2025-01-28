@@ -275,7 +275,7 @@ def get_feature_selection_inputs(feature_importance_df, feature_names):
         f'Number of Intervals', 
         min_value=1, 
         max_value=20, 
-        value=3,
+        value=10,
         key='joint_importance_intervals'
     )
     
@@ -286,6 +286,7 @@ def _joint_interval_importance(model, X_test, y_test, feature_1_index, feature_2
     """
     calculate importance for different intervals of two features.
     """
+
     # get feature values
     feature1_values = X_test.iloc[:, feature_1_index].values
     feature2_values = X_test.iloc[:, feature_2_index].values
@@ -358,6 +359,7 @@ def visualize_joint_importance(model, X_test, y_test, feature_1_index, feature_2
     """
     visualize the joint importance of two features using heatmaps for different metrics.
     """
+
     # get feature names
     feature_names = list(model.feature_names_in_)
     feature1_name = feature_names[feature_1_index]
@@ -370,8 +372,8 @@ def visualize_joint_importance(model, X_test, y_test, feature_1_index, feature_2
     )
     
     # create interval labels
-    x_labels = [f'{intervals_1[i]:.9f}-{intervals_1[i+1]:.9f}' for i in range(len(intervals_1)-1)]
-    y_labels = [f'{intervals_2[i]:.9f}-{intervals_2[i+1]:.9f}' for i in range(len(intervals_2)-1)]
+    x_labels = [f'{intervals_1[i]:.4f}-{intervals_1[i+1]:.4f}' for i in range(len(intervals_1)-1)]
+    y_labels = [f'{intervals_2[i]:.4f}-{intervals_2[i+1]:.4f}' for i in range(len(intervals_2)-1)]
     
     # create metrics dictionary
     metrics = {
@@ -393,83 +395,76 @@ def visualize_joint_importance(model, X_test, y_test, feature_1_index, feature_2
         st.warning('Please select at least one metric to display')
         return
     
-    # create heatmap for each selected metric
-    for metric_name in selected_metrics:
-        metric_values = metrics[metric_name]
-        
-        # ensure all values are greater than zero
-        metric_values = np.maximum(metric_values, 1e-10)
-        
-        # create heatmap
-        fig = go.Figure(data=go.Heatmap(
-            z=metric_values,
-            x=x_labels,
-            y=y_labels,
-            colorscale='RdYlBu_r',
-            zmin=np.min(metric_values),
-            zmax=np.max(metric_values),
-            colorbar=dict(
-                title=f"{metric_name} Difference",
-                titleside="right",
-                tickformat='.9f'
-            ),
-            text=[[f"{val:.9f}" for val in row] for row in metric_values],
-            texttemplate='%{text}',
-            textfont={"size": 10, "color": "black"},
-            showscale=True,
-            hovertemplate=(
-                f"{feature1_name}: %{{x}}<br>" +
-                f"{feature2_name}: %{{y}}<br>" +
-                f"{metric_name} Difference: %{{text}}<extra></extra>"
+    # if matrix contains only 0, warn user (for any metric)
+    if all(np.all(metric_values == 0) for metric_values in metrics.values()):
+        st.warning("The differences in error metrics are too small to display meaningful charts. Try a different feature or larger dataset.")
+    else: 
+
+        st.write("") # add space between elements
+
+        # create heatmap for each selected metric
+        for metric_name in selected_metrics:
+            metric_values = metrics[metric_name]
+            
+            # ensure all values are greater than zero
+            metric_values = np.maximum(metric_values, 1e-10)
+
+            min_value = np.min(metric_values)
+            max_value = np.max(metric_values)
+            
+            # create heatmap
+            fig = go.Figure(data=go.Heatmap(
+                z=metric_values,
+                x=x_labels,
+                y=y_labels,
+                colorscale=[[0, 'white'], [1, BLUE]], # TODO: check whether values can be outside of this
+                zmin=min_value,
+                zmax=max_value,
+                hovertemplate=(
+                    f"{feature1_name}: %{{x}}<br>" +
+                    f"{feature2_name}: %{{y}}<br>" +
+                    f"{metric_name} Difference: %{{z:.4f}}<extra></extra>"
+                )
+            ))
+            
+            # update layout
+            fig.update_layout(
+                title={'text': f'{metric_name}'},
+                xaxis_title=f'Feature: {feature1_name}',
+                yaxis_title=f'Feature: {feature2_name}',
+                xaxis={
+                    'side': 'bottom',
+                    'tickangle': 45,
+                    'showgrid': False,
+                    'range': [-0.5, num_intervals1 - 0.5]
+                },
+                yaxis={
+                    'autorange': 'reversed',
+                    'showgrid': False,
+                    'range': [-0.5, num_intervals2 - 0.5]
+                },
+                margin=dict(l=20, r=20, t=20, b=20)
             )
-        ))
-        
-        # add grid lines
-        for i in range(num_intervals1 + 1):
-            fig.add_shape(
-                type='line',
-                x0=i - 0.5,
-                x1=i - 0.5,
-                y0=-0.5,
-                y1=num_intervals2 - 0.5,
-                line=dict(color='black', width=1)
+
+            # add grid lines
+            for i in range(num_intervals1 + 1):
+                fig.add_shape(
+                    type='line',
+                    x0=i - 0.5,
+                    x1=i - 0.5,
+                    y0=-0.5,
+                    y1=num_intervals2 - 0.5,
+                    line=dict(color='white', width=1)
             )
-        
-        for i in range(num_intervals2 + 1):
-            fig.add_shape(
-                type='line',
-                x0=-0.5,
-                x1=num_intervals1 - 0.5,
-                y0=i - 0.5,
-                y1=i - 0.5,
-                line=dict(color='black', width=1)
+            
+            for i in range(num_intervals2 + 1):
+                fig.add_shape(
+                    type='line',
+                    x0=-0.5,
+                    x1=num_intervals1 - 0.5,
+                    y0=i - 0.5,
+                    y1=i - 0.5,
+                    line=dict(color='white', width=1)
             )
-        
-        # update layout
-        fig.update_layout(
-            title={
-                'text': f'Joint Feature Importance ({metric_name}): {feature1_name} & {feature2_name}',
-                'y': 0.95,
-                'x': 0.5,
-                'xanchor': 'center',
-                'yanchor': 'top'
-            },
-            xaxis_title=feature1_name,
-            yaxis_title=feature2_name,
-            height=600,
-            width=800,
-            xaxis={
-                'side': 'bottom',
-                'tickangle': 45,
-                'showgrid': False,
-                'range': [-0.5, num_intervals1 - 0.5]
-            },
-            yaxis={
-                'autorange': 'reversed',
-                'showgrid': False,
-                'range': [-0.5, num_intervals2 - 0.5]
-            },
-            plot_bgcolor='rgba(0,0,0,0)'
-        )
-        
-        st.plotly_chart(fig, use_container_width=True)
+            
+            st.plotly_chart(fig, use_container_width=True)
