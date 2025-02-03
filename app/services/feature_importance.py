@@ -44,36 +44,33 @@ def visualize_feature_importance(model):
     # assign rank based on importance
     sorted_feature_importance['rank'] = range(1, len(sorted_feature_importance) + 1)
 
-    # display feature importance
-    with st.expander("**Feature Importance**", expanded=True):
+    # allow user to select range of values to show
+    num_features = st.slider('Number of Features', min_value=1, max_value=len(sorted_feature_importance), value=max(1, len(sorted_feature_importance) // 3))
+    sorted_feature_importance = sorted_feature_importance.head(num_features)
+    logging.info(f"Top {num_features} feature importance displayed successfully.")
 
-        # allow user to select range of values to show
-        num_features = st.slider('Number of Features', min_value=1, max_value=len(sorted_feature_importance), value=max(1, len(sorted_feature_importance) // 3))
-        sorted_feature_importance = sorted_feature_importance.head(num_features)
-        logging.info(f"Top {num_features} feature importance displayed successfully.")
+    # create bar chart
+    fig = go.Figure(data=go.Bar(
+        x=sorted_feature_importance['rank'],
+        y=sorted_feature_importance['importance'],
+        marker_color=BLUE,
+        textposition='auto',
+        hovertemplate='Rank: %{x}<br>Feature: %{customdata}<br>Importance: %{y:.4f}<extra></extra>',
+        customdata=sorted_feature_importance['feature']
+    ))
 
-        # create bar chart
-        fig = go.Figure(data=go.Bar(
-            x=sorted_feature_importance['rank'],
-            y=sorted_feature_importance['importance'],
-            marker_color=BLUE,
-            textposition='auto',
-            hovertemplate='Rank: %{x}<br>Feature: %{customdata}<br>Importance: %{y:.4f}<extra></extra>',
-            customdata=sorted_feature_importance['feature']
-        ))
+    # update layout
+    fig.update_layout(
+        title='',
+        xaxis_title='Rank',
+        yaxis_title='Importance',
+        margin=dict(l=20, r=20, t=20, b=20),
+        height=600,
+        showlegend=False
+    )
 
-        # update layout
-        fig.update_layout(
-            title='',
-            xaxis_title='Rank',
-            yaxis_title='Importance',
-            margin=dict(l=20, r=20, t=20, b=20),
-            height=600,
-            showlegend=False
-        )
-
-        st.plotly_chart(fig, use_container_width=True)
-        logging.info("Feature importance displayed successfully.")
+    st.plotly_chart(fig, use_container_width=True)
+    logging.info("Feature importance displayed successfully.")
 
 def _define_intervals(X_test, feature_index=0, num_intervals=10):
     """
@@ -154,7 +151,6 @@ def _interval_importance(model, X_test, y_test, feature_index=0, num_intervals=1
         recall_diffs.append(recall_diff)
         f1_diffs.append(f1_diff)
 
-
     # convert to numpy arrays and ensure no zero values
     accuracy_diffs = np.array(accuracy_diffs)
     precision_diffs = np.array(precision_diffs)
@@ -195,7 +191,7 @@ def visualize_interval_importance(model, X_test, y_test, feature_index=0, num_in
     logging.info(f"Interval labels created successfully: {x_labels}")
 
     # check if all differences are zero
-    if np.all(accuracy_diffs == 0):
+    if np.all(accuracy_diffs == 1e-10):
         st.warning("The differences in error metrics are too small to display meaningful charts. Try a different feature or larger dataset.")
         logging.warning("The differences in error metrics are too small to display meaningful charts. Try a different feature or larger dataset.")
         return
@@ -204,10 +200,10 @@ def visualize_interval_importance(model, X_test, y_test, feature_index=0, num_in
     logging.info("Metric values comparison:")
     for i in range(len(accuracy_diffs)):
         logging.info(f"Index {i}:")
-        logging.info(f"  Accuracy: {accuracy_diffs[i]:.8f}")
-        logging.info(f"  Precision: {precision_diffs[i]:.8f}")
-        logging.info(f"  Recall: {recall_diffs[i]:.8f}")
-        logging.info(f"  F1: {f1_diffs[i]:.8f}")
+        logging.info(f"Accuracy: {accuracy_diffs[i]:.8f}")
+        logging.info(f"Precision: {precision_diffs[i]:.8f}")
+        logging.info(f"Recall: {recall_diffs[i]:.8f}")
+        logging.info(f"F1: {f1_diffs[i]:.8f}")
 
     # create line chart
     fig = go.Figure()
@@ -443,8 +439,9 @@ def visualize_joint_importance(model, X_test, y_test, feature_1_index, feature_2
         return
     
     # if matrix contains only 0, warn user (for any metric)
-    if all(np.all(metric_values == 0) for metric_values in metrics.values()):
+    if all(np.all(metric_values == 1e-10) for metric_values in metrics.values()):
         st.warning("The differences in error metrics are too small to display meaningful charts. Try a different feature or larger dataset.")
+        logging.warning("The differences in error metrics are too small to display meaningful charts. Try a different feature or larger dataset.")
     else: 
 
         st.write("") # add space between elements
@@ -465,8 +462,8 @@ def visualize_joint_importance(model, X_test, y_test, feature_1_index, feature_2
                 zmin=0,
                 zmax=np.max(metric_values),
                 hovertemplate=(
-                    f"{feature1_name}: %{{x}}<br>" +
-                    f"{feature2_name}: %{{y}}<br>" +
+                    f"Feature {feature1_name}: %{{x}}<br>" +
+                    f"Feature {feature2_name}: %{{y}}<br>" +
                     f"{metric_name} Difference: %{{z:.4f}}<extra></extra>"
                 )
             ))

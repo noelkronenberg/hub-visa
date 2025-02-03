@@ -330,12 +330,13 @@ with tab3:
     if 'first_run' not in st.session_state or st.session_state.data_error:
         st.warning("Please train the model first to view feature analysis.")
     else:
-        visualize_feature_importance(
-            st.session_state.rf_classifier
-        )
-        logging.info("Feature importance displayed successfully.")
+        with st.expander("**Feature Importance**", expanded=True):
+            visualize_feature_importance(
+                st.session_state.rf_classifier
+            )
+            logging.info("Feature importance displayed successfully.")
 
-        with st.expander("**Interval Importance**", expanded=True):
+        with st.expander("**Interval Importance**", expanded=False):
 
             st.write("""
                 Assess the impact of feature value intervals on the prediction accuracy by splitting a feature into intervals and mapping every data point to the boundaries of that interval. By comparing evaluation metrics of original data to the one with a transformed interval of our choice, we derive the importance of that interval to the prediction.
@@ -378,7 +379,7 @@ with tab3:
             )
 
         # joint interval importance
-        with st.expander("**Joint Interval Importance**", expanded=True):
+        with st.expander("**Joint Interval Importance**", expanded=False):
 
             st.write("""
                 Assess the impact of feature value intervals on the prediction accuracy by splitting two features into intervals and mapping every data point to the boundaries of the intervals. By comparing evaluation metrics of original data to the ones with transformed intervals of our choice, we derive the importance of the intervals to the prediction.
