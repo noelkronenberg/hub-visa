@@ -171,3 +171,4 @@ data-exploration/lucas_organic_carbon/.DS_Store
 00_EDA/.DS_Store
 .DS_Store
 00_EDA/lucas_organic_carbon/.DS_Store
+!app/lucas_organic_carbon/training_test/autoencoder_predictions.csv

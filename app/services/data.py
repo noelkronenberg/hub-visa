@@ -12,6 +12,10 @@ demo_cases = {
         'target': 'app/lucas_organic_carbon/target/lucas_organic_carbon_target.csv',
         'training': 'app/lucas_organic_carbon/training_test/compressed_data.csv'
     },
+    'Lucas Organic Carbon (AE)': {
+        'target': 'app/lucas_organic_carbon/target/lucas_organic_carbon_target.csv',
+        'training': 'app/lucas_organic_carbon/training_test/autoencoder_predictions.csv'
+    },
     'Iris Dataset': {
         'sklearn_dataset': load_iris
     },
@@ -69,7 +73,7 @@ def load_data(load_preset_target, load_preset_training, target_data=None, traini
 
         df_combined = pd.merge(df_training, df_target, left_index=True, right_index=True)
 
-    # load data from presets
+    # load data from presets or given paths
     else:
         df_target = pd.read_csv(demo_cases[selected_demo_case]['target'])
         logging.info("Loaded target data from preset.")
