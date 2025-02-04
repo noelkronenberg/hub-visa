@@ -45,6 +45,7 @@ The app is live and hosted on the Streamlit Community Cloud: [visa-demo.streamli
 |M5|Feature Importance Concept (*Konzept II*)|[[presentation slides](https://docs.google.com/presentation/d/1sSXYiWVSzP-jKvBnRYrvyK_wPkAHrHsJ0h6WnJ6E7G0/edit?usp=sharing)]||
 |M6|Feature Importance Prototype (*Komponente II*)|[see *Components*]|[see *Improvements*]|
 |M7|Model Comparison Concept (*Konzept III*)|[[presentation slides](https://docs.google.com/presentation/d/1NYDmAEd8p7cuZHK_mLCI6-d52McKKU-4vzNwit14Toc/edit?usp=sharing)]||
+|M8|Model Comparison Prototype (*Komponente III*)|[see *Components*]||
 
 ## Components
 
@@ -63,6 +64,7 @@ The app is live and hosted on the Streamlit Community Cloud: [visa-demo.streamli
 | C9  | Impact of Intervals           | Show the average impact of intervals.                                                                           | done   | M6        |
 | C10 | Impact of 2-D Intervals       | Show the average impact of 2-D intervals.                                                                       | done   | M6        |
 | C11 | Improved Division of Tasks    | Allow the user to focus on a single task (e.g. model training, error exploration, investigation of importance). | done   | M6        |
+| C12 | Auto Encoded Data    | Allow for selection of auto encoded data. | done   | M8        |
 
 
 ## Activities
@@ -117,6 +119,8 @@ The app is live and hosted on the Streamlit Community Cloud: [visa-demo.streamli
 | C11 | Improved Division of Tasks    |                                                                             |        | Noel Kronenberg            |
 | A1  |                               | Adding of tabs for Explorative Error Analysis and Feature Importance.       | done   | Noel Kronenberg            |
 | A2  |                               | Refactoring (e.g. encapsulating) the code to be more readable.              | done   | Noel Kronenberg            |
+| C12 | Auto Encoded Data             |                                                                             |        | Noel Kronenberg            |
+| A1  |                               | Encode data locally and upload as an option.                                | done   | Noel Kronenberg            |
 
 ## Improvements
 
