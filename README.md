@@ -65,6 +65,7 @@ The app is live and hosted on the Streamlit Community Cloud: [visa-demo.streamli
 | C10 | Impact of 2-D Intervals       | Show the average impact of 2-D intervals.                                                                       | done   | M6        |
 | C11 | Improved Division of Tasks    | Allow the user to focus on a single task (e.g. model training, error exploration, investigation of importance). | done   | M6        |
 | C12 | Auto Encoded Data    | Allow for selection of auto encoded data. | done   | M8        |
+| C13 | Model Comparison    | Allow for the selection of a second model to compare. | open   | M8        |
 
 
 ## Activities
@@ -120,7 +121,10 @@ The app is live and hosted on the Streamlit Community Cloud: [visa-demo.streamli
 | A1  |                               | Adding of tabs for Explorative Error Analysis and Feature Importance.       | done   | Noel Kronenberg            |
 | A2  |                               | Refactoring (e.g. encapsulating) the code to be more readable.              | done   | Noel Kronenberg            |
 | C12 | Auto Encoded Data             |                                                                             |        | Noel Kronenberg            |
-| A1  |                               | Encode data locally and upload as an option.                                | done   | Noel Kronenberg            |
+| A1  |                               | Encoding data locally and upload as an option.                                | done   | Noel Kronenberg            |
+| C13 | Model Comparison              |                                                                             |        | Noel Kronenberg            |
+| A1  |                               | Allowing user to check "Compare Models" and select new model parameters and data. | open   |                         |
+| A2  |                               | Enabling the side-by-side comparison of the selected models in all relevant views. | open   |                         |
 
 ## Improvements
 
