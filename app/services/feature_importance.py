@@ -74,8 +74,9 @@ def visualize_feature_importance(model):
 
 def _define_intervals(X_test, feature_index=0, num_intervals=10):
     """
-    define intervals for a given feature.
+    Define intervals for a given feature.
     """
+
     min_val = X_test.iloc[:, feature_index].min()
     max_val = X_test.iloc[:, feature_index].max()
     
@@ -89,8 +90,9 @@ def _define_intervals(X_test, feature_index=0, num_intervals=10):
 
 def _interval_importance(model, X_test, y_test, original_accuracy, original_precision, original_recall, original_f1, feature_index=0, num_intervals=10):
     """
-    use transform_left parameter to map both to the left interval limit or the right interval limit.
+    Use transform_left parameter to map both to the left interval limit or the right interval limit.
     """
+    
     # get original evaluation metrics
     accuracy = original_accuracy
     precision = original_precision
@@ -166,8 +168,9 @@ def _interval_importance(model, X_test, y_test, original_accuracy, original_prec
 
 def visualize_interval_importance(model, X_test, y_test, original_accuracy, original_precision, original_recall, original_f1, feature_index=0, num_intervals=10):
     """
-    visualize interval importance using transform_left parameter.
+    Visualize interval importance using transform_left parameter.
     """
+
     # ensure X_test and y_test are DataFrames
     if not isinstance(X_test, pd.DataFrame):
         X_test = pd.DataFrame(X_test)
@@ -285,7 +288,7 @@ def visualize_interval_importance(model, X_test, y_test, original_accuracy, orig
 
 def get_feature_selection_inputs(feature_importance_df, feature_names):
     """
-    Create input controls for feature selection
+    Create input controls for feature selection.
     """
 
     col1, col2 = st.columns(2)
@@ -328,7 +331,7 @@ def get_feature_selection_inputs(feature_importance_df, feature_names):
 def _joint_interval_importance(model, X_test, y_test, feature_1_index, feature_2_index,
                              num_intervals1, num_intervals2):
     """
-    calculate importance for different intervals of two features.
+    Calculate importance for different intervals of two features.
     """
 
     # get feature values
@@ -401,7 +404,7 @@ def _joint_interval_importance(model, X_test, y_test, feature_1_index, feature_2
 def visualize_joint_importance(model, X_test, y_test, feature_1_index, feature_2_index,
                              num_intervals1, num_intervals2):
     """
-    visualize the joint importance of two features using heatmaps for different metrics.
+    Visualize the joint importance of two features using heatmaps for different metrics.
     """
 
     # get feature names

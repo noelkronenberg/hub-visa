@@ -35,16 +35,10 @@ preset_training = demo_cases['Lucas Organic Carbon (PCA)']['training']
 
 # load data
 @st.cache_data(show_spinner=False)
-def load_data(load_preset_target, load_preset_training, target_data=None, training_data=None, selected_demo_case='Lucas Organic Carbon (PCA)'):
+def load_data(target_data=None, training_data=None, selected_demo_case='Lucas Organic Carbon (PCA)'):
     """
     Load the data for training.
-    
-    Parameters:
-    - load_preset_target: Deprecated. Use selected_demo_case instead. 
-    - load_preset_training: Deprecated. Use selected_demo_case instead.
     """
-
-    # TODO: remove load_preset_target and load_preset_training in future versions
     
     # load data from sklearn
     if 'sklearn_dataset' in demo_cases[selected_demo_case]:

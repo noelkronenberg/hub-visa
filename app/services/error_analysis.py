@@ -115,6 +115,7 @@ def _display_confusion_matrix(cm, unique_labels, selected_class_index):
     """
     Display the confusion matrix.
     """
+    
     fig = go.Figure(data=go.Heatmap(
         z=cm,
         x=[f'{label}' for label in unique_labels],
