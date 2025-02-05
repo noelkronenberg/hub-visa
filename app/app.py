@@ -375,6 +375,10 @@ with tab3:
                 st.session_state.rf_classifier,
                 st.session_state.X_test, 
                 st.session_state.y_test, 
+                st.session_state.accuracy, 
+                st.session_state.precision, 
+                st.session_state.recall, 
+                st.session_state.f1,
                 feature_index, 
                 num_intervals
             )

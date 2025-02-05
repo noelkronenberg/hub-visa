@@ -87,15 +87,15 @@ def _define_intervals(X_test, feature_index=0, num_intervals=10):
     intervals = np.linspace(min_val, max_val, num_intervals+1)
     return intervals
 
-def _interval_importance(model, X_test, y_test, feature_index=0, num_intervals=10):
+def _interval_importance(model, X_test, y_test, original_accuracy, original_precision, original_recall, original_f1, feature_index=0, num_intervals=10):
     """
     use transform_left parameter to map both to the left interval limit or the right interval limit.
     """
     # get original evaluation metrics
-    accuracy = st.session_state.accuracy
-    precision = st.session_state.precision
-    recall = st.session_state.recall
-    f1 = st.session_state.f1
+    accuracy = original_accuracy
+    precision = original_precision
+    recall = original_recall
+    f1 = original_f1
 
     # define intervals
     intervals = _define_intervals(X_test, feature_index, num_intervals)
@@ -164,7 +164,7 @@ def _interval_importance(model, X_test, y_test, feature_index=0, num_intervals=1
     
     return accuracy_diffs, precision_diffs, recall_diffs, f1_diffs
 
-def visualize_interval_importance(model, X_test, y_test, feature_index=0, num_intervals=10):
+def visualize_interval_importance(model, X_test, y_test, original_accuracy, original_precision, original_recall, original_f1, feature_index=0, num_intervals=10):
     """
     visualize interval importance using transform_left parameter.
     """
@@ -178,7 +178,8 @@ def visualize_interval_importance(model, X_test, y_test, feature_index=0, num_in
 
     # get differences in error metrics
     accuracy_diffs, precision_diffs, recall_diffs, f1_diffs = _interval_importance(
-        model, X_test, y_test, feature_index, num_intervals
+        model, X_test, y_test, original_accuracy, original_precision, original_recall, original_f1, 
+        feature_index, num_intervals
     )
     logging.info(f"Differences in error metrics calculated successfully: {accuracy_diffs}, {precision_diffs}, {recall_diffs}, {f1_diffs}")
 
