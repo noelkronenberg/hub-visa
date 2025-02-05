@@ -59,15 +59,33 @@ def visualize_feature_importance(model):
         customdata=sorted_feature_importance['feature']
     ))
 
-    # update layout
-    fig.update_layout(
-        title='',
-        xaxis_title='Rank',
-        yaxis_title='Importance',
-        margin=dict(l=20, r=20, t=20, b=20),
-        height=600,
-        showlegend=False
-    )
+    # normalize importance values to the maximum possible importance
+    max_importance = sorted_feature_importance['importance'].max()
+    sorted_feature_importance['normalized_importance'] = sorted_feature_importance['importance'] / max_importance
+
+    # add checkbox for scaling y-axis
+    scale_y_axis = st.checkbox('Scale Y-axis from 0 to 1', value=False)
+
+    # update layout with normalized y-axis if checkbox is selected
+    if scale_y_axis:
+        fig.update_layout(
+            title='',
+            xaxis_title='Rank',
+            yaxis_title='Normalized Importance',
+            margin=dict(l=20, r=20, t=20, b=20),
+            height=600,
+            showlegend=False,
+            yaxis=dict(range=[0, 1]) # normalize y-axis to range from 0 to 1
+        )
+    else:
+        fig.update_layout(
+            title='',
+            xaxis_title='Rank',
+            yaxis_title='Importance',
+            margin=dict(l=20, r=20, t=20, b=20),
+            height=600,
+            showlegend=False
+        )
 
     st.plotly_chart(fig, use_container_width=True)
     logging.info("Feature importance displayed successfully.")
