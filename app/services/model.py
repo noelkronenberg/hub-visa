@@ -43,7 +43,7 @@ def evaluate_model(y_test, y_pred, label_encoder=None, normalize_cm=None):
 
         # compute confusion matrix (and save in session state)
         if normalize_cm:
-            cm = confusion_matrix(y_test, y_pred, labels=range(len(unique_labels)), normalize='true')
+            cm = confusion_matrix(y_test, y_pred, labels=range(len(unique_labels)), normalize='all')
         else:
             cm = confusion_matrix(y_test, y_pred, labels=range(len(unique_labels)))
 
