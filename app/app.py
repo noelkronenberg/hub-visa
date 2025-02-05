@@ -121,12 +121,13 @@ with st.sidebar.expander("**Model**", expanded=True):
 
     # check if the resulting data is too small or none
     if data_percentage != st.session_state.data_percentage:
-        df_combined = pd.concat([st.session_state['training_data'], st.session_state['target_data']], axis=1)
-        _, _, _, _, label_encoder = prepare_data(df_combined, data_percentage)
-        if label_encoder is None or len(label_encoder.classes_) == 0:
-            st.warning("The resulting data is too small or none. Please choose a higher percentage.")
-            logging.warning("The resulting data is too small or none. Please choose a higher percentage.")
-            data_percentage = st.session_state.data_percentage
+        if 'training_data' in st.session_state and 'target_data' in st.session_state:
+            df_combined = pd.concat([st.session_state['training_data'], st.session_state['target_data']], axis=1)
+            _, _, _, _, label_encoder = prepare_data(df_combined, data_percentage)
+            if label_encoder is None or len(label_encoder.classes_) == 0:
+                st.warning("The resulting data is too small or none. Please choose a higher percentage.")
+                logging.warning("The resulting data is too small or none. Please choose a higher percentage.")
+                data_percentage = st.session_state.data_percentage
 
     normalize_cm = st.checkbox(
         'Normalize Confusion Matrix', 
