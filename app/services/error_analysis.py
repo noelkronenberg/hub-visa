@@ -67,8 +67,8 @@ def _display_class_counts(y_test, y_pred, unique_labels, selected_class):
         )
     )
 
-    # display the figure
-    st.plotly_chart(fig)
+    # Add unique key when displaying the chart
+    st.plotly_chart(fig, use_container_width=True, key=f"class_counts_{id(y_test)}_{id(y_pred)}")
     logging.info("Class counts displayed as histogram successfully.")
 
 def _display_class_metrics(y_test, y_pred, selected_class, selected_class_index):
@@ -186,8 +186,8 @@ def _display_confusion_matrix(cm, unique_labels, selected_class_index):
         line=dict(color=SELECTION_COLOR, width=1),
     )
     
-    # display the figure
-    st.plotly_chart(fig)
+    # Add unique key when displaying the chart
+    st.plotly_chart(fig, use_container_width=True, key=f"confusion_matrix_{id(cm)}")
     logging.info("Confusion matrix displayed successfully.")
 
 # show results
