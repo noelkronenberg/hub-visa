@@ -273,20 +273,6 @@ tab1, tab2, tab3 = st.tabs([ "Data Exploration", "Explorative Error Analysis", "
 
 with tab1:
 
-    # show data as DataFrames
-    if show_data:
-        with st.spinner('Loading the data...'):
-            df_target = st.session_state.get(f'target_data{st.session_state.suffix}', pd.read_csv(preset_target))
-            df_training = st.session_state.get(f'training_data{st.session_state.suffix}', pd.read_csv(preset_training))
-            
-            with st.expander("**Training Data**", expanded=False):
-                st.write(df_training)
-            
-            with st.expander("**Target Data**", expanded=False):
-                st.write(df_target)
-            
-            logging.info("Raw data displayed successfully.")
-
     if f'first_run{st.session_state.suffix}' not in st.session_state:
         st.warning("Please train the model first to view data exploration.")
 
@@ -296,6 +282,20 @@ with tab1:
             col1, col2 = st.columns(2)
 
             with col1:
+                # show data as DataFrames
+                if show_data:
+                    with st.spinner('Loading the data...'):
+                        df_target = st.session_state.get('target_data', pd.read_csv(preset_target))
+                        df_training = st.session_state.get('training_data', pd.read_csv(preset_training))
+                        
+                        with st.expander("**Training Data**", expanded=False):
+                            st.write(df_training)
+                        
+                        with st.expander("**Target Data**", expanded=False):
+                            st.write(df_target)
+                        
+                        logging.info("Raw data displayed successfully.")
+
                 df_combined = pd.concat([st.session_state[f'training_data'], st.session_state[f'target_data']], axis=1)
                 st.subheader("Main Model")
                 plot_target_distribution(df_combined, suffix='')
@@ -304,6 +304,20 @@ with tab1:
                 logging.info("Main model data exploration displayed successfully.")
 
             with col2:
+                # show data as DataFrames
+                if show_data:
+                    with st.spinner('Loading the data...'):
+                        df_target = st.session_state.get('target_data_compare', pd.read_csv(preset_target))
+                        df_training = st.session_state.get('training_data_compare', pd.read_csv(preset_training))
+                        
+                        with st.expander("**Training Data**", expanded=False):
+                            st.write(df_training)
+                        
+                        with st.expander("**Target Data**", expanded=False):
+                            st.write(df_target)
+                        
+                        logging.info("Raw data displayed successfully.")
+
                 st.subheader("Comparison Model")
                 df_combined_compare = pd.concat([st.session_state[f'training_data_compare'], st.session_state[f'target_data_compare']], axis=1)
                 plot_target_distribution(df_combined_compare, suffix='_compare')
@@ -311,6 +325,20 @@ with tab1:
                 plot_feature_distribution(df_combined_compare, suffix='_compare')
                 logging.info("Comparison model data exploration displayed successfully.")
         else:
+            # show data as DataFrames
+            if show_data:
+                with st.spinner('Loading the data...'):
+                    df_target = st.session_state.get(f'target_data{st.session_state.suffix}', pd.read_csv(preset_target))
+                    df_training = st.session_state.get(f'training_data{st.session_state.suffix}', pd.read_csv(preset_training))
+                    
+                    with st.expander("**Training Data**", expanded=False):
+                        st.write(df_training)
+                    
+                    with st.expander("**Target Data**", expanded=False):
+                        st.write(df_target)
+                    
+                    logging.info("Raw data displayed successfully.")
+
             df_combined = pd.concat([st.session_state[f'training_data{st.session_state.suffix}'], st.session_state[f'target_data{st.session_state.suffix}']], axis=1)
             plot_target_distribution(df_combined, suffix='')
             plot_feature_profiles(df_combined, suffix='')
@@ -366,22 +394,22 @@ with tab2:
                     st.session_state[f'cm_compare'],
                     suffix='_compare'
                 )
-                logging.info("Comparison model results displayed successfully.")
+                logging.info(f"Comparison model results displayed successfully.")
         else:
             visualize_error_analysis(
-                st.session_state.y_test, 
-                st.session_state.y_pred, 
-                st.session_state.unique_labels, 
-                st.session_state.selected_class, 
-                st.session_state.selected_class_index, 
-                st.session_state.get('accuracy', 0), 
-                st.session_state.get('precision', 0), 
-                st.session_state.get('recall', 0), 
-                st.session_state.get('f1', 0), 
-                st.session_state.cm,
-                suffix=''
+                st.session_state[f'y_test{st.session_state.suffix}'], 
+                st.session_state[f'y_pred{st.session_state.suffix}'], 
+                st.session_state[f'unique_labels{st.session_state.suffix}'], 
+                st.session_state[f'selected_class{st.session_state.suffix}'], 
+                st.session_state[f'selected_class_index{st.session_state.suffix}'], 
+                st.session_state.get(f'accuracy{st.session_state.suffix}', 0), 
+                st.session_state.get(f'precision{st.session_state.suffix}', 0), 
+                st.session_state.get(f'recall{st.session_state.suffix}', 0), 
+                st.session_state.get(f'f1{st.session_state.suffix}', 0), 
+                st.session_state[f'cm{st.session_state.suffix}'],
+                suffix=st.session_state.suffix
             )
-            logging.info("Results displayed successfully.")
+            logging.info(f"Results displayed successfully.")
 
 # -----------------------------------------------------------
 # Feature Importance & Interactions
@@ -449,7 +477,7 @@ with tab3:
                 st.subheader("Comparison Model")
                 with st.expander("**Feature Importance**", expanded=True):
                     visualize_feature_importance(
-                        st.session_state[f'rf_classifier{st.session_state.suffix}'],
+                        st.session_state[f'rf_classifier_compare'],
                         suffix='_compare'
                     )
                     logging.info("Feature importance displayed successfully.")
@@ -458,20 +486,20 @@ with tab3:
                     st.write("""
                         Assess the impact of feature value intervals on the prediction accuracy by splitting a feature into intervals and mapping every data point to the boundaries of that interval. By comparing evaluation metrics of original data to the one with a transformed interval of our choice, we derive the importance of that interval to the prediction.
                     """)
-                    importances = st.session_state[f'rf_classifier{st.session_state.suffix}'].feature_importances_
-                    feature_names = st.session_state[f'X_test{st.session_state.suffix}'].columns
+                    importances = st.session_state[f'rf_classifier_compare'].feature_importances_
+                    feature_names = st.session_state[f'X_test_compare'].columns
                     feature_importance_df = pd.DataFrame({'feature': feature_names, 'importance': importances}).sort_values(by='importance', ascending=False)
                     selected_feature = st.selectbox("Select Feature", feature_importance_df['feature'], index=0, key='feature_compare')
-                    feature_index = list(st.session_state[f'X_test{st.session_state.suffix}'].columns).index(selected_feature)
+                    feature_index = list(st.session_state[f'X_test_compare'].columns).index(selected_feature)
                     num_intervals = st.slider('Number of Intervals', min_value=1, max_value=20, value=10, key='intervals_compare')
                     visualize_interval_importance(
-                        st.session_state[f'rf_classifier{st.session_state.suffix}'], 
-                        st.session_state[f'X_test{st.session_state.suffix}'], 
-                        st.session_state[f'y_test{st.session_state.suffix}'], 
-                        st.session_state[f'accuracy{st.session_state.suffix}'], 
-                        st.session_state[f'precision{st.session_state.suffix}'], 
-                        st.session_state[f'recall{st.session_state.suffix}'], 
-                        st.session_state[f'f1{st.session_state.suffix}'], 
+                        st.session_state[f'rf_classifier_compare'], 
+                        st.session_state[f'X_test_compare'], 
+                        st.session_state[f'y_test_compare'], 
+                        st.session_state[f'accuracy_compare'], 
+                        st.session_state[f'precision_compare'], 
+                        st.session_state[f'recall_compare'], 
+                        st.session_state[f'f1_compare'], 
                         feature_index, 
                         num_intervals,
                         suffix='_compare'
@@ -481,14 +509,14 @@ with tab3:
                     st.write("""
                         Assess the impact of feature value intervals on the prediction accuracy by splitting two features into intervals and mapping every data point to the boundaries of the intervals. By comparing evaluation metrics of original data to the ones with transformed intervals of our choice, we derive the importance of the intervals to the prediction.
                     """)
-                    importances = st.session_state[f'rf_classifier{st.session_state.suffix}'].feature_importances_
-                    feature_names = st.session_state[f'X_test{st.session_state.suffix}'].columns
+                    importances = st.session_state[f'rf_classifier_compare'].feature_importances_
+                    feature_names = st.session_state[f'X_test_compare'].columns
                     feature_importance_df = pd.DataFrame({'feature': feature_names, 'importance': importances}).sort_values(by='importance', ascending=False)
                     selected_feature1, selected_feature2, feature1_index, feature2_index, num_intervals1, num_intervals2 = get_feature_selection_inputs(feature_importance_df, feature_names, suffix='_compare')
                     visualize_joint_importance(
-                        st.session_state[f'rf_classifier{st.session_state.suffix}'], 
-                        st.session_state[f'X_test{st.session_state.suffix}'], 
-                        st.session_state[f'y_test{st.session_state.suffix}'], 
+                        st.session_state[f'rf_classifier_compare'], 
+                        st.session_state[f'X_test_compare'], 
+                        st.session_state[f'y_test_compare'], 
                         feature1_index, 
                         feature2_index, 
                         num_intervals1, 
@@ -498,8 +526,8 @@ with tab3:
         else:
             with st.expander("**Feature Importance**", expanded=True):
                 visualize_feature_importance(
-                    st.session_state.rf_classifier,
-                    suffix=''
+                    st.session_state[f'rf_classifier{st.session_state.suffix}'],
+                    suffix=st.session_state.suffix
                 )
                 logging.info("Feature importance displayed successfully.")
 
@@ -507,40 +535,40 @@ with tab3:
                 st.write("""
                     Assess the impact of feature value intervals on the prediction accuracy by splitting a feature into intervals and mapping every data point to the boundaries of that interval. By comparing evaluation metrics of original data to the one with a transformed interval of our choice, we derive the importance of that interval to the prediction.
                 """)
-                importances = st.session_state.rf_classifier.feature_importances_
-                feature_names = st.session_state.X_test.columns
+                importances = st.session_state[f'rf_classifier{st.session_state.suffix}'].feature_importances_
+                feature_names = st.session_state[f'X_test{st.session_state.suffix}'].columns
                 feature_importance_df = pd.DataFrame({'feature': feature_names, 'importance': importances}).sort_values(by='importance', ascending=False)
-                selected_feature = st.selectbox("Select Feature", feature_importance_df['feature'], index=0, key=f'feature')
-                feature_index = list(st.session_state.X_test.columns).index(selected_feature)
-                num_intervals = st.slider('Number of Intervals', min_value=1, max_value=20, value=10, key=f'intervals')
+                selected_feature = st.selectbox("Select Feature", feature_importance_df['feature'], index=0, key=f'feature{st.session_state.suffix}')
+                feature_index = list(st.session_state[f'X_test{st.session_state.suffix}'].columns).index(selected_feature)
+                num_intervals = st.slider('Number of Intervals', min_value=1, max_value=20, value=10, key=f'intervals{st.session_state.suffix}')
                 visualize_interval_importance(
-                    st.session_state.rf_classifier, 
-                    st.session_state.X_test, 
-                    st.session_state.y_test, 
-                    st.session_state.accuracy, 
-                    st.session_state.precision, 
-                    st.session_state.recall, 
-                    st.session_state.f1, 
+                    st.session_state[f'rf_classifier{st.session_state.suffix}'], 
+                    st.session_state[f'X_test{st.session_state.suffix}'], 
+                    st.session_state[f'y_test{st.session_state.suffix}'], 
+                    st.session_state[f'accuracy{st.session_state.suffix}'], 
+                    st.session_state[f'precision{st.session_state.suffix}'], 
+                    st.session_state[f'recall{st.session_state.suffix}'], 
+                    st.session_state[f'f1{st.session_state.suffix}'], 
                     feature_index, 
                     num_intervals,
-                    suffix=''
+                    suffix=st.session_state.suffix
                 )
 
             with st.expander("**Joint Interval Importance**", expanded=False):
                 st.write("""
                     Assess the impact of feature value intervals on the prediction accuracy by splitting two features into intervals and mapping every data point to the boundaries of the intervals. By comparing evaluation metrics of original data to the ones with transformed intervals of our choice, we derive the importance of the intervals to the prediction.
                 """)
-                importances = st.session_state.rf_classifier.feature_importances_
-                feature_names = st.session_state.X_test.columns
+                importances = st.session_state[f'rf_classifier{st.session_state.suffix}'].feature_importances_
+                feature_names = st.session_state[f'X_test{st.session_state.suffix}'].columns
                 feature_importance_df = pd.DataFrame({'feature': feature_names, 'importance': importances}).sort_values(by='importance', ascending=False)
-                selected_feature1, selected_feature2, feature1_index, feature2_index, num_intervals1, num_intervals2 = get_feature_selection_inputs(feature_importance_df, feature_names, suffix='')
+                selected_feature1, selected_feature2, feature1_index, feature2_index, num_intervals1, num_intervals2 = get_feature_selection_inputs(feature_importance_df, feature_names, suffix=st.session_state.suffix)
                 visualize_joint_importance(
-                    st.session_state.rf_classifier, 
-                    st.session_state.X_test, 
-                    st.session_state.y_test, 
+                    st.session_state[f'rf_classifier{st.session_state.suffix}'], 
+                    st.session_state[f'X_test{st.session_state.suffix}'], 
+                    st.session_state[f'y_test{st.session_state.suffix}'], 
                     feature1_index, 
                     feature2_index, 
                     num_intervals1, 
                     num_intervals2,
-                    suffix=''
+                    suffix=st.session_state.suffix
                 )
