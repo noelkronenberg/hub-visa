@@ -44,8 +44,18 @@ def visualize_feature_importance(model):
     # assign rank based on importance
     sorted_feature_importance['rank'] = range(1, len(sorted_feature_importance) + 1)
 
+    # Generate unique keys using model id
+    slider_key = f"num_features_slider_{id(model)}"
+    checkbox_key = f"scale_y_axis_{id(model)}"
+
     # allow user to select range of values to show
-    num_features = st.slider('Number of Features', min_value=1, max_value=len(sorted_feature_importance), value=max(1, len(sorted_feature_importance) // 3))
+    num_features = st.slider(
+        'Number of Features', 
+        min_value=1, 
+        max_value=len(sorted_feature_importance), 
+        value=max(1, len(sorted_feature_importance) // 3),
+        key=slider_key  # Add unique key here
+    )
     sorted_feature_importance = sorted_feature_importance.head(num_features)
     logging.info(f"Top {num_features} feature importance displayed successfully.")
 
@@ -64,7 +74,7 @@ def visualize_feature_importance(model):
     sorted_feature_importance['normalized_importance'] = sorted_feature_importance['importance'] / max_importance
 
     # add checkbox for scaling y-axis
-    scale_y_axis = st.checkbox('Scale Y-axis from 0 to 1', value=False)
+    scale_y_axis = st.checkbox('Scale Y-axis from 0 to 1', value=False, key=checkbox_key)
 
     # update layout with normalized y-axis if checkbox is selected
     if scale_y_axis:
@@ -188,7 +198,6 @@ def visualize_interval_importance(model, X_test, y_test, original_accuracy, orig
     """
     Visualize interval importance using transform_left parameter.
     """
-
     # ensure X_test and y_test are DataFrames
     if not isinstance(X_test, pd.DataFrame):
         X_test = pd.DataFrame(X_test)
