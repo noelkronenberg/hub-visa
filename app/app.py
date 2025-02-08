@@ -292,12 +292,11 @@ with tab1:
 
     # check whether data is loaded
     elif not st.session_state.data_error:
-        df_combined = pd.concat([st.session_state[f'training_data{st.session_state.suffix}'], st.session_state[f'target_data{st.session_state.suffix}']], axis=1)
-
         if st.session_state.compare_models:
             col1, col2 = st.columns(2)
 
             with col1:
+                df_combined = pd.concat([st.session_state[f'training_data'], st.session_state[f'target_data']], axis=1)
                 st.subheader("Main Model")
                 plot_target_distribution(df_combined, suffix='')
                 plot_feature_profiles(df_combined, suffix='')
@@ -312,6 +311,7 @@ with tab1:
                 plot_feature_distribution(df_combined_compare, suffix='_compare')
                 logging.info("Comparison model data exploration displayed successfully.")
         else:
+            df_combined = pd.concat([st.session_state[f'training_data{st.session_state.suffix}'], st.session_state[f'target_data{st.session_state.suffix}']], axis=1)
             plot_target_distribution(df_combined, suffix='')
             plot_feature_profiles(df_combined, suffix='')
             plot_feature_distribution(df_combined, suffix='')
