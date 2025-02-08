@@ -30,7 +30,7 @@ def _get_feature_importance(model):
 
     return feature_importance
 
-def visualize_feature_importance(model):
+def visualize_feature_importance(model,key_suffix=''):
     """
     Visualize feature importance using built-in feature importance of sklearn models.
     """
@@ -97,7 +97,7 @@ def visualize_feature_importance(model):
             showlegend=False
         )
 
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, use_container_width=True, key=f'feature_importance_{key_suffix}')
     logging.info("Feature importance displayed successfully.")
 
 def _define_intervals(X_test, feature_index=0, num_intervals=10):
