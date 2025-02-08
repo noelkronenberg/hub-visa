@@ -30,7 +30,7 @@ def _get_feature_importance(model):
 
     return feature_importance
 
-def visualize_feature_importance(model):
+def visualize_feature_importance(model, suffix):
     """
     Visualize feature importance using built-in feature importance of sklearn models.
     """
@@ -64,7 +64,7 @@ def visualize_feature_importance(model):
     sorted_feature_importance['normalized_importance'] = sorted_feature_importance['importance'] / max_importance
 
     # add checkbox for scaling y-axis
-    scale_y_axis = st.checkbox('Scale Y-axis from 0 to 1', value=False)
+    scale_y_axis = st.checkbox('Scale Y-axis from 0 to 1', value=False, key=f'scale_y_axis_{suffix}')
 
     # update layout with normalized y-axis if checkbox is selected
     if scale_y_axis:
@@ -87,7 +87,7 @@ def visualize_feature_importance(model):
             showlegend=False
         )
 
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, use_container_width=True, key=f'feature_importance_{suffix}')
     logging.info("Feature importance displayed successfully.")
 
 def _define_intervals(X_test, feature_index=0, num_intervals=10):
@@ -184,7 +184,7 @@ def _interval_importance(model, X_test, y_test, original_accuracy, original_prec
     
     return accuracy_diffs, precision_diffs, recall_diffs, f1_diffs
 
-def visualize_interval_importance(model, X_test, y_test, original_accuracy, original_precision, original_recall, original_f1, feature_index=0, num_intervals=10):
+def visualize_interval_importance(model, X_test, y_test, original_accuracy, original_precision, original_recall, original_f1, feature_index=0, num_intervals=10, suffix=''):
     """
     Visualize interval importance using transform_left parameter.
     """
@@ -276,7 +276,7 @@ def visualize_interval_importance(model, X_test, y_test, original_accuracy, orig
         )
     )
 
-    st.plotly_chart(fig, use_container_width=True, key='interval_importance_line')
+    st.plotly_chart(fig, use_container_width=True, key=f'interval_importance_line_{suffix}')
     logging.info("Line chart displayed successfully.")
 
     # bar chart for accuracy_diffs
@@ -301,10 +301,10 @@ def visualize_interval_importance(model, X_test, y_test, original_accuracy, orig
     )
     logging.info("Bar chart layout updated successfully.")
 
-    st.plotly_chart(fig, use_container_width=True, key='interval_importance_bar')
+    st.plotly_chart(fig, use_container_width=True, key=f'interval_importance_bar_{suffix}')
     logging.info("Bar chart displayed successfully.")
 
-def get_feature_selection_inputs(feature_importance_df, feature_names):
+def get_feature_selection_inputs(feature_importance_df, feature_names, suffix):
     """
     Create input controls for feature selection.
     """
@@ -320,7 +320,7 @@ def get_feature_selection_inputs(feature_importance_df, feature_names):
             "Select First Feature", 
             sorted_features,
             index=0,
-            key='joint_importance_feature1'
+            key=f'feature_selection_feature1_{suffix}'
         )
         feature1_index = list(feature_names).index(selected_feature1)
 
@@ -331,7 +331,7 @@ def get_feature_selection_inputs(feature_importance_df, feature_names):
             "Select Second Feature",
             remaining_features,
             index=0,
-            key='joint_importance_feature2'
+            key=f'feature_selection_feature2_{suffix}'
         )
         feature2_index = list(feature_names).index(selected_feature2)
         
@@ -341,7 +341,7 @@ def get_feature_selection_inputs(feature_importance_df, feature_names):
         min_value=1, 
         max_value=20, 
         value=10,
-        key='joint_importance_intervals'
+        key=f'feature_selection_num_intervals_{suffix}'
     )
     
     return selected_feature1, selected_feature2, feature1_index, feature2_index, num_intervals, num_intervals
@@ -420,7 +420,7 @@ def _joint_interval_importance(model, X_test, y_test, feature_1_index, feature_2
     return accuracy_diffs, precision_diffs, recall_diffs, f1_diffs, intervals_1, intervals_2
 
 def visualize_joint_importance(model, X_test, y_test, feature_1_index, feature_2_index,
-                             num_intervals1, num_intervals2):
+                             num_intervals1, num_intervals2, suffix):
     """
     Visualize the joint importance of two features using heatmaps for different metrics.
     """
@@ -453,7 +453,7 @@ def visualize_joint_importance(model, X_test, y_test, feature_1_index, feature_2
         'Select Metrics to Display',
         options=list(metrics.keys()),
         default=['Accuracy'],
-        key='joint_importance_metrics'
+        key=f'joint_importance_metrics_{suffix}'
     )
     
     if not selected_metrics:
@@ -539,4 +539,4 @@ def visualize_joint_importance(model, X_test, y_test, feature_1_index, feature_2
                     line=dict(color='white', width=1)
             )
             
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, use_container_width=True, key=f'joint_importance_{metric_name}_{suffix}')

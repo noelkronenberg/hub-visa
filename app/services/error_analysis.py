@@ -18,7 +18,7 @@ def _display_overall_metrics(accuracy, precision, recall, f1):
     col4.metric("F1 Score", f"{f1:.2f}")
     logging.info("Overall metrics displayed successfully.")
 
-def _display_class_counts(y_test, y_pred, unique_labels, selected_class):
+def _display_class_counts(y_test, y_pred, unique_labels, selected_class, suffix):
     """
     Display the class counts as a histogram.
     """
@@ -68,7 +68,7 @@ def _display_class_counts(y_test, y_pred, unique_labels, selected_class):
     )
 
     # display the figure
-    st.plotly_chart(fig)
+    st.plotly_chart(fig, key=f"class_counts_{suffix}")
     logging.info("Class counts displayed as histogram successfully.")
 
 def _display_class_metrics(y_test, y_pred, selected_class, selected_class_index):
@@ -111,7 +111,7 @@ def _display_class_metrics(y_test, y_pred, selected_class, selected_class_index)
 
     logging.info(f"Metrics for class {selected_class} displayed successfully.")    
 
-def _display_confusion_matrix(cm, unique_labels, selected_class_index):
+def _display_confusion_matrix(cm, unique_labels, selected_class_index, suffix):
     """
     Display the confusion matrix.
     """
@@ -187,11 +187,11 @@ def _display_confusion_matrix(cm, unique_labels, selected_class_index):
     )
     
     # display the figure
-    st.plotly_chart(fig)
+    st.plotly_chart(fig, key=f"confusion_matrix_{suffix}")
     logging.info("Confusion matrix displayed successfully.")
 
 # show results
-def visualize_error_analysis(y_test, y_pred, unique_labels, selected_class, selected_class_index, accuracy, precision, recall, f1, cm):
+def visualize_error_analysis(y_test, y_pred, unique_labels, selected_class, selected_class_index, accuracy, precision, recall, f1, cm, suffix):
     """
     Display the error analysis results.
     """
@@ -205,7 +205,7 @@ def visualize_error_analysis(y_test, y_pred, unique_labels, selected_class, sele
        _display_class_metrics(y_test, y_pred, selected_class, selected_class_index)
 
     with st.expander("**Class Counts**", expanded=True):
-        _display_class_counts(y_test, y_pred, unique_labels, selected_class)
+        _display_class_counts(y_test, y_pred, unique_labels, selected_class, suffix)
 
     with st.expander("**Confusion Matrix**", expanded=True):
-        _display_confusion_matrix(cm, unique_labels, selected_class_index)
+        _display_confusion_matrix(cm, unique_labels, selected_class_index, suffix)

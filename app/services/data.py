@@ -112,7 +112,7 @@ def prepare_data(df_combined, data_percentage):
 
     return X_train, X_test, y_train, y_test, label_encoder
 
-def plot_target_distribution(df_combined):
+def plot_target_distribution(df_combined, suffix):
     """
     Plot target distribution.
     """
@@ -131,10 +131,10 @@ def plot_target_distribution(df_combined):
 
     # display the figure
     with st.expander("**Target Distribution**", expanded=True):
-        st.plotly_chart(fig, key='target_distribution')
+        st.plotly_chart(fig, key=f'target_distribution_{suffix}')
         logging.info("Target distribution displayed successfully.")
 
-def plot_feature_profiles(df_combined):
+def plot_feature_profiles(df_combined, suffix):
     """
     Plot feature profiles.
     """
@@ -143,7 +143,7 @@ def plot_feature_profiles(df_combined):
 
     with st.expander("**Feature Profiles**", expanded=True):
         # sample feature profiles
-        num_samples = st.slider('Number of Samples', min_value=1, max_value=10, value=3, key='num_samples_feature')
+        num_samples = st.slider('Number of Samples', min_value=1, max_value=10, value=3, key=f'num_samples_{suffix}')
 
         # select a few feature profiles to display
         sample_feature_profiles = df_combined.sample(num_samples).drop(columns=[target_column])
@@ -153,11 +153,11 @@ def plot_feature_profiles(df_combined):
         for idx, row in sample_feature_profiles.iterrows():
             fig_feature.add_scatter(x=row.index.astype(str), y=row.values, mode='lines', name=f'Sample {idx}', hovertemplate='Feature: %{x}<br>Value: %{y}<extra></extra>')
         fig_feature.update_layout(xaxis_title='Feature', yaxis_title='Value', template='plotly_dark', margin=dict(l=20, r=20, t=20, b=20))
-        st.plotly_chart(fig_feature, key='feature_profiles')
+        st.plotly_chart(fig_feature, key=f'feature_profiles_{suffix}')
 
         logging.info("Feature profiles displayed successfully.")
 
-def plot_feature_distribution(df_combined):
+def plot_feature_distribution(df_combined, suffix):
     """
     Plot feature distribution.
     """
@@ -187,5 +187,5 @@ def plot_feature_distribution(df_combined):
 
     # display the figure
     with st.expander("**Feature Distribution**", expanded=True):
-        st.plotly_chart(fig_boxplot, key='feature_distribution')
+        st.plotly_chart(fig_boxplot, key=f'feature_distribution_{suffix}')
         logging.info("Feature distribution displayed successfully.")
