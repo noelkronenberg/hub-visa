@@ -3,6 +3,12 @@ import pandas as pd
 from sklearn.metrics import accuracy_score
 import logging
 import pickle
+import os
+from datetime import datetime
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
+from sklearn.metrics import classification_report, confusion_matrix
 
 from services.error_analysis import visualize_error_analysis
 from services.feature_importance import visualize_feature_importance, visualize_interval_importance, visualize_joint_importance, get_feature_selection_inputs
@@ -22,6 +28,20 @@ st.write("""
     and configuring the model parameters in the sidebar. When the desired results are achieved, 
     you can download the trained model.
 """)
+
+# Initialize session state variables
+if 'model1_file' not in st.session_state:
+    st.session_state.model1_file = "Current Model"
+if 'model2_file' not in st.session_state:
+    st.session_state.model2_file = "Comparison Model"
+if 'model1' not in st.session_state:
+    st.session_state.model1 = None
+if 'model2' not in st.session_state:
+    st.session_state.model2 = None
+if 'compare_models' not in st.session_state:
+    st.session_state.compare_models = False
+if 'rf_classifier' not in st.session_state:
+    st.session_state.rf_classifier = None
 
 # -----------------------------------------------------------
 # Sidebar
@@ -56,6 +76,25 @@ with st.sidebar.expander("**Data**", expanded=False):
         logging.info("Added training file to session state.")
 
     show_data = st.checkbox('Show raw data')
+
+    # Display current test dataset information
+    st.write("**Current Test Dataset :**")
+
+    if 'X_test' in st.session_state:
+        n_features = st.session_state.X_test.shape[1]
+        n_samples = st.session_state.X_test.shape[0]
+        
+        # Get dataset name
+        if training_file is not None:
+           dataset_type = training_file.name  # Use uploaded file name
+        else:
+            dataset_type = st.session_state.selected_demo_case if st.session_state.selected_demo_case else "Custom Dataset"
+                
+        st.write(f"Name: {dataset_type}")
+        st.write(f"Number of features: {n_features}")
+        st.write(f"Number of samples: {n_samples}")
+    else:
+        st.write("No test dataset loaded yet.")
 
 # initialize session state with default parameters
 if 'max_depth' not in st.session_state:
@@ -209,6 +248,8 @@ with st.sidebar.expander("**Model**", expanded=True):
                     min_samples_leaf, 
                     max_features
                 )
+                # Update model1 when rf_classifier is updated
+                st.session_state.model1 = st.session_state.rf_classifier
                 st.session_state.y_pred = st.session_state.rf_classifier.predict(st.session_state.X_test)
                 logging.info("Model trained successfully.")
 
@@ -224,15 +265,167 @@ with st.sidebar.expander("**Model**", expanded=True):
                 
                 st.session_state.first_run = False
 
-    # download model button
+    # save and download model buttons
     if 'rf_classifier' in st.session_state:
-        model_bytes = pickle.dumps(st.session_state.rf_classifier)
-        st.download_button(
-            label="Download Model",
-            data=model_bytes,
-            file_name="trained_model.pkl",
-            mime="application/octet-stream"
-        )
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            if st.button('Save Model'):
+                # Create Model directory if it doesn't exist
+                model_dir = os.path.join('Model')
+                os.makedirs(model_dir, exist_ok=True)
+                
+                existing_models = [f for f in os.listdir(model_dir) if f.startswith('model') and f.endswith('.pkl')]
+                
+                # Create model info dictionary
+                model_info = {
+                    'model': st.session_state.rf_classifier,
+                    'feature_names': st.session_state.X_test.columns.tolist()
+                }
+                
+                # Save new model
+                next_model_num = len(existing_models) + 1
+                model_path = os.path.join(model_dir, f'model{next_model_num}.pkl')
+                with open(model_path, 'wb') as f:
+                    pickle.dump(model_info, f)
+                st.success(f"Model saved to: {model_path}")
+                logging.info(f"Model saved to {model_path}")
+                
+                # Refresh the list of models after saving
+                existing_models = [f for f in os.listdir(model_dir) if f.startswith('model') and f.endswith('.pkl')]
+                
+                # Check number of models after saving
+                if len(existing_models) == 3:
+                    # Get creation times for all models
+                    model_times = {}
+                    for model in existing_models:
+                        model_path = os.path.join(model_dir, model)
+                        model_times[model] = os.path.getctime(model_path)
+                    
+                    # Find the oldest model
+                    oldest_model = min(model_times, key=model_times.get)
+                    
+                    # Show warning when exactly 3 models are saved
+                    st.warning(f"Maximum number of saved models 3 reached. The oldest model '{oldest_model}' will be automatically deleted when saving a new model.")
+                    
+                elif len(existing_models) >= 4:
+                    # Get creation times for all models
+                    model_times = {}
+                    for model in existing_models:
+                        model_path = os.path.join(model_dir, model)
+                        model_times[model] = os.path.getctime(model_path)
+                    
+                    # Find and delete oldest model
+                    oldest_model = min(model_times, key=model_times.get)
+                    os.remove(os.path.join(model_dir, oldest_model))
+                    st.info(f"Oldest model '{oldest_model}' has been deleted.")
+        
+            # Download button
+            model_bytes = pickle.dumps(st.session_state.rf_classifier)
+            st.download_button(
+                label="Download Model",
+                data=model_bytes,
+                file_name="trained_model.pkl",
+                mime="application/octet-stream"
+            )
+
+# -----------------------------------------------------------
+# Model Comparison 
+# -----------------------------------------------------------
+with st.sidebar.expander("**Model Comparison**", expanded=False):
+    st.write("Select models to compare")
+    
+    # Get all model files from the Model directory
+    model_dir = os.path.join('Model')
+    if os.path.exists(model_dir):
+        model_files = [f for f in os.listdir(model_dir) if f.endswith('.pkl')]
+        
+        if len(model_files) < 2:
+            st.warning("At least two saved models are required for comparison")
+        else:
+            # Enable model comparison checkbox
+            st.session_state.compare_models = st.checkbox("Enable Model Comparison", 
+                                                        key='enable_model_comparison')
+            
+            if st.session_state.compare_models:
+                # Select first model
+                model1_file = st.selectbox(
+                    'Select Model A',
+                    model_files,
+                    key='model1_select'
+                )
+                
+                available_models = [f for f in model_files if f != model1_file]
+                
+                # Select second model
+                model2_file = st.selectbox(
+                    'Select Model B',
+                    available_models,
+                    key='model2_select'
+                )
+                
+                # Load selected models
+                with open(os.path.join(model_dir, model1_file), 'rb') as f:
+                    model_info = pickle.load(f)
+                    st.session_state.model1 = model_info['model'] if isinstance(model_info, dict) else model_info
+
+                with open(os.path.join(model_dir, model2_file), 'rb') as f:
+                    model_info = pickle.load(f)
+                    st.session_state.model2 = model_info['model'] if isinstance(model_info, dict) else model_info
+                
+                # Save model filenames to session state
+                st.session_state.model1_file = model1_file
+                st.session_state.model2_file = model2_file
+                
+                # Set current comparison model
+                st.session_state.compare_model = st.session_state.model2
+                st.session_state.compare_model_file = model2_file
+
+                # Create data with correct number of features for each model
+                n_samples = len(st.session_state.X_test)
+
+                # Create zero matrices that fit each model
+                X_test_model1_values = np.zeros((n_samples, st.session_state.model1.n_features_in_))
+                X_test_model2_values = np.zeros((n_samples, st.session_state.model2.n_features_in_))
+
+                # Fill in actual data, using only available features
+                # Models trained on different datasets require different numbers of features as input when being tested
+                n_features_available = st.session_state.X_test.shape[1]
+                X_test_model1_values[:, :min(n_features_available, st.session_state.model1.n_features_in_)] = \
+                    st.session_state.X_test.values[:, :min(n_features_available, st.session_state.model1.n_features_in_)]
+                X_test_model2_values[:, :min(n_features_available, st.session_state.model2.n_features_in_)] = \
+                    st.session_state.X_test.values[:, :min(n_features_available, st.session_state.model2.n_features_in_)]
+
+                # Create DataFrame using the same feature names as during training
+                X_test_model1 = pd.DataFrame(
+                    X_test_model1_values,
+                    columns=[str(i) for i in range(st.session_state.model1.n_features_in_)]
+                )
+                X_test_model2 = pd.DataFrame(
+                    X_test_model2_values,
+                    columns=[str(i) for i in range(st.session_state.model2.n_features_in_)]
+                )
+
+                # Make predictions using respective test data
+                y_pred_model1 = st.session_state.model1.predict(X_test_model1)
+                y_pred_model2 = st.session_state.model2.predict(X_test_model2)
+
+            else:
+                # When comparison is disabled, allow selecting single model to display
+                selected_model = st.selectbox(
+                    'Select Model to Display',
+                    model_files,
+                    key='single_model_select'
+                )
+                
+                # Load selected model
+                with open(os.path.join(model_dir, selected_model), 'rb') as f:
+                    model_info = pickle.load(f)
+                    st.session_state.model1 = model_info['model'] if isinstance(model_info, dict) else model_info
+                    model_name = selected_model.replace('.pkl', '')
+                    st.session_state.model1_file = f"Current Model: {model_name}"
+    else:
+        st.warning("Model directory does not exist or is empty. Please save models first")
 
 # show results
 if 'first_run' in st.session_state:
@@ -257,14 +450,13 @@ if 'first_run' in st.session_state:
     # update selected class index when the selected class changes
     st.session_state.selected_class_index = list(st.session_state.unique_labels).index(st.session_state.selected_class)
 
-tab1, tab2, tab3 = st.tabs([ "Data Exploration", "Explorative Error Analysis", "Feature Importance"])
+tab1, tab2, tab3 = st.tabs(["Data Exploration", "Explorative Error Analysis", "Feature Importance"])
 
 # -----------------------------------------------------------
 # Data Exploration
 # -----------------------------------------------------------
 
 with tab1:
-
     # show data as DataFrames
     if show_data:
         with st.spinner('Loading the data...'):
@@ -284,56 +476,117 @@ with tab1:
 
     # check whether data is loaded
     elif not st.session_state.data_error:
-        df_combined = pd.concat([st.session_state['training_data'], st.session_state['target_data']], axis=1)
-
+        df_combined = pd.concat([st.session_state['training_data'], 
+                              st.session_state['target_data']], axis=1)
         plot_target_distribution(df_combined)
         plot_feature_profiles(df_combined)
         plot_feature_distribution(df_combined)
         
         logging.info("Data exploration displayed successfully.")
     else:
-        st.error("Data preparation failed. Full custom data are likely not provided. Please upload both target and training data.")
-        logging.error("Data preparation failed. Full custom data are likely not provided. Please upload both target and training data.")
+        st.error("Data preparation failed. Full custom data are likely not provided.")
+        logging.error("Data preparation failed.")
 
 # -----------------------------------------------------------
 # Explorative Error Analysis
 # -----------------------------------------------------------
 
 with tab2:
-
-    # show placeholder
     if 'first_run' not in st.session_state or st.session_state.data_error:
-        placeholder = st.empty()
-        placeholder.warning("Please train the model first to view error analysis.")
-        logging.info("Placeholder displayed successfully.")
+        st.warning("Please train the model first to view error analysis.")
     else:
-        visualize_error_analysis(
-            st.session_state.y_test, 
-            st.session_state.y_pred, 
-            st.session_state.unique_labels, 
-            st.session_state.selected_class, 
-            st.session_state.selected_class_index, 
-            st.session_state.get('accuracy', 0), 
-            st.session_state.get('precision', 0), 
-            st.session_state.get('recall', 0), 
-            st.session_state.get('f1', 0), 
-            st.session_state.cm
-        )
-        logging.info("Results displayed successfully.")
+        if 'compare_models' in st.session_state and st.session_state.compare_models:
+            # Use two-column layout when comparison is enabled
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                st.write(f"**{st.session_state.model1_file}**")
+                visualize_error_analysis(
+                    st.session_state.y_test,
+                    y_pred_model1,
+                    st.session_state.unique_labels,
+                    st.session_state.selected_class,
+                    st.session_state.selected_class_index,
+                    st.session_state.accuracy,
+                    st.session_state.precision,
+                    st.session_state.recall,
+                    st.session_state.f1,
+                    st.session_state.cm
+                )
+            
+            with col2:
+                st.write(f"**{st.session_state.model2_file}**")
+                if st.session_state.model2 is not None:
+                    compare_accuracy, compare_precision, compare_recall, compare_f1, \
+                    compare_unique_labels, compare_cm = evaluate_model(
+                        st.session_state.y_test,
+                        y_pred_model2,
+                        st.session_state.label_encoder,
+                        st.session_state.normalize_cm
+                    )
+                    
+                    visualize_error_analysis(
+                        st.session_state.y_test,
+                        y_pred_model2,
+                        compare_unique_labels,
+                        st.session_state.selected_class,
+                        st.session_state.selected_class_index,
+                        compare_accuracy,
+                        compare_precision,
+                        compare_recall,
+                        compare_f1,
+                        compare_cm
+                    )
+                else:
+                    st.warning("Model B is not loaded.")
+        else:
+            # Use full-width layout when no comparison
+            st.write(f"**{st.session_state.model1_file}**")
+            visualize_error_analysis(
+                st.session_state.y_test,
+                st.session_state.y_pred,
+                st.session_state.unique_labels,
+                st.session_state.selected_class,
+                st.session_state.selected_class_index,
+                st.session_state.accuracy,
+                st.session_state.precision,
+                st.session_state.recall,
+                st.session_state.f1,
+                st.session_state.cm
+            )
 
 # -----------------------------------------------------------
-# Feature Importance & Interactions
+# Feature Importance
 # -----------------------------------------------------------
 
 with tab3:
     if 'first_run' not in st.session_state or st.session_state.data_error:
         st.warning("Please train the model first to view feature analysis.")
     else:
-        with st.expander("**Feature Importance**", expanded=True):
-            visualize_feature_importance(
-                st.session_state.rf_classifier
-            )
-            logging.info("Feature importance displayed successfully.")
+        if 'compare_models' in st.session_state and st.session_state.compare_models:
+            # Use two-column layout when comparison is enabled
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                st.write(f"**{st.session_state.model1_file}**")
+                if st.session_state.model1 is not None:
+                    visualize_feature_importance(st.session_state.model1)
+                else:
+                    st.warning("Model A is not loaded.")
+            
+            with col2:
+                st.write(f"**{st.session_state.model2_file}**")
+                if st.session_state.model2 is not None:
+                    visualize_feature_importance(st.session_state.model2)
+                else:
+                    st.warning("Model B is not loaded.")
+        else:
+            # Use full-width layout when no comparison
+            st.write(f"**{st.session_state.model1_file}**")
+            if st.session_state.model1 is not None:
+                visualize_feature_importance(st.session_state.model1)
+            else:
+                st.warning("Model is not loaded.")
 
         with st.expander("**Interval Importance**", expanded=False):
 
