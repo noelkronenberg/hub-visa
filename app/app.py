@@ -277,7 +277,7 @@ with tab1:
         st.warning("Please train the model first to view data exploration.")
 
     # check whether data is loaded
-    elif not st.session_state.data_error:
+    elif not st.session_state[f'data_error{st.session_state.suffix}']:
         if st.session_state.compare_models:
             col1, col2 = st.columns(2)
 
