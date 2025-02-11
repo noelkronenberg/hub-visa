@@ -1,6 +1,7 @@
 # VisA
 
-Visual analytics app for exploring machine learning classifications.
+Visual analytics app for exploring machine learning classifications.   
+Developed as part of course work (and beyond) by students at HU Berlin.
 
 [![Unit Tests](https://github.com/noelkronenberg/hub-visa/actions/workflows/tests.yml/badge.svg)](https://github.com/noelkronenberg/hub-visa/actions/workflows/tests.yml)
 
