@@ -25,7 +25,7 @@ streamlit run app/app.py # open application
 - ```.streamlit/``` Directory containing Streamlit configurations.
   - `config.toml` Configuration file for Streamlit server settings.
 - ```app/``` Directory containing Streamlit application files.
-  - `lucas_organic_carbon/` Directory containing data files for the Lucas Organic Carbon dataset.
+  - `lucas_organic_carbon/` Directory containing data files for the Lucas Organic Carbon dataset [[ESDAC](https://esdac.jrc.ec.europa.eu/projects/lucas)].
       - `target/` Directory containing target data files.
       - `training_test/` Directory containing training and test data files.
   - `services/` Directory containing supporting files.
