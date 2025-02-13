@@ -9,6 +9,15 @@ Developed as part of course work (and beyond) by students at HU Berlin.
 
 The app is live and hosted on the Streamlit Community Cloud: [visa-demo.streamlit.app](https://visa-demo.streamlit.app/)
 
+## Set-up
+
+```bash
+git clone https://github.com/noelkronenberg/visa.git # clone repository
+cd visa # change directory
+pip install -r app/requirements.txt # install dependencies
+streamlit run app/app.py # open application
+```
+
 ## Structure
 
 - ```.github/workflows/``` Directory containing GitHub Actions configurations.
